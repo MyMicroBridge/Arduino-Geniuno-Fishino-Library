@@ -9,12 +9,15 @@
 #include "Client.h"
 #include <String.h>
 #include <Flash.h>
+#include <HttpClient.h>
+
+#include "MMBParameter.h";
 
 
 //debug
 #define DEBUG 1
 
-#define MMB_API_BASE_URL "api.mymicrobridge.com"
+#define MMB_API_HOSTNAME "api.mymicrobridge.com"
 
 //MMB class
 class MMB {
@@ -33,21 +36,26 @@ class MMB {
 		int read();
 		void close();
 
+		//aggiunta parametri
+		void addParameter(MMBParameter parameter);
+
 
 		//---DEBUG---
 		void printDataDebug();
 
-		void debugPrint(const char *msg);
+		void debugPrint(String msg);
 
 	private:
 
 		char *buildResourceURL(); //build API URL
 
-
-		Client *_client; //net client
+		Client *_client; //net client (client passato)
+		HttpClient _http; //http client (SimpleHttpClient library)
 
 		const char *_account; //user account name
 		const char *_api; //user API name
+
+		MMBParameter[] *params; //array per i parametri
 
 
 };
