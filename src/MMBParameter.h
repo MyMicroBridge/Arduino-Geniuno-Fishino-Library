@@ -32,10 +32,12 @@ class MMBParameter {
 
 	private:
 
-		const int _type; //tipo di parametro
+		MMBParameter(const int type, const char *offset, const int position, const char *value);
+
+		int _type; //tipo di parametro
 		const char *_offset; //offset
 
-		const int _position; //position se usato (URI_TEMPLATE)
+		int _position; //position se usato (URI_TEMPLATE)
 		const char *_value; //value se usato (QUERY_STRING o X_WWW_FORM_URLENCODED)
 
 

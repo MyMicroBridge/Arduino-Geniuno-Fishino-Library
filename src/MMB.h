@@ -55,7 +55,7 @@ class MMB {
 		const char *_account; //user account name
 		const char *_api; //user API name
 
-		MMBParameter[] *params; //array per i parametri
+		MMBParameter params[]; //array per i parametri
 
 
 };
