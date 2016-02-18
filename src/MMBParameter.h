@@ -8,9 +8,9 @@
 #include "Arduino.h"
 
 //tipi di parametri (gli altri sono mantenuti all'interno del portale e quindi non hanno accesso verso l'esterno)
-#define QUERY_STRING 1
-#define X_WWW_FORM_URLENCODED 2
-#define URI_TEMPLATE 3
+#define MMB_PARAMETER_QUERY_STRING 1
+#define MMB_PARAMETER_X_WWW_FORM_URLENCODED 2
+#define MMB_PARAMETER_URI_TEMPLATE 3
 
 
 //debug
@@ -27,7 +27,15 @@ class MMBParameter {
 		MMBParameter(const int type, const int position, const char *value); //constructor
 		~MMBParameter(); //destroyer
 
+		//set
 		void setValue(const char *value);
+
+		//get
+		int getType();
+		const char *getOffset();
+		int getPosition();
+		const char *getValue();
+
 
 
 	private:

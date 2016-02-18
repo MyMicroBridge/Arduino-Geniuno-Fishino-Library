@@ -12,9 +12,26 @@ MMBParameter::MMBParameter(const int type, const int position): MMBParameter(typ
 
 MMBParameter::MMBParameter(const int type, const int position, const char *value): MMBParameter(type, "\0", position, value){} //constructor
 
-//salvo il valore del parametro
+//set method
 void MMBParameter::setValue(const char *value) {
 	_value = value;
+}
+
+//get method
+int MMBParameter::getType() {
+	return _type;
+}
+
+const char *MMBParameter::getOffset() {
+	return _offset;
+}
+
+int MMBParameter::getPosition() {
+	return _position;
+}
+
+const char *MMBParameter::getValue() {
+	return _value;
 }
 
 //---PRIVATE---

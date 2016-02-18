@@ -19,6 +19,8 @@
 
 #define MMB_API_HOSTNAME "api.mymicrobridge.com"
 
+#define MAX_PARAMETER 10
+
 //MMB class
 class MMB {
 	
@@ -37,7 +39,7 @@ class MMB {
 		void close();
 
 		//aggiunta parametri
-		void addParameter(MMBParameter parameter);
+		int addParameter(MMBParameter& parameter);
 
 
 		//---DEBUG---
@@ -55,7 +57,9 @@ class MMB {
 		const char *_account; //user account name
 		const char *_api; //user API name
 
-		MMBParameter params[]; //array per i parametri
+		int _pos;
+
+		MMBParameter *_params[MAX_PARAMETER]; //array per i parametri
 
 
 };

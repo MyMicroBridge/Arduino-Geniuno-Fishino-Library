@@ -7,6 +7,8 @@
 //costructor and create _http client
 MMB::MMB(Client& client): _http(client) {
 	_client = &client; //save instance of client
+
+	_pos = 0;
 }
 
 //destroyer
@@ -54,28 +56,6 @@ int MMB::run() {
 		return status; //ritorno il codice di errore
 	}
 
-	// if ((*_client).connect(server, 80)) {
-	// 	debugPrint("\nSERVER: connected\n");
-		
-	// 	// invia la richiesta HTTP:
-	// 	(*_client) << F("GET /asciilogo.txt HTTP/1.1\r\n");
-	// 	(*_client) << F("Host: arduino.cc\r\n");
-	// 	(*_client) << F("Connection: close\r\n");
-	// 	(*_client).println();
-
-	// 	debugPrint("SERVER: Request sent\n");
-	// 	debugPrint("Finish!\n");
-
-	// 	return 1; //connessione riuscita
-
-	// } else {
-	// 	// se la connessione non è riuscita:
-	// 	debugPrint("connection failed\n");
-	// 	debugPrint("Finish!\n");
-
-	// 	return 0; //connessione non riuscita
-	// }
-
 }
 
 //lettura risposta
@@ -92,9 +72,26 @@ void MMB::close() {
 }
 
 
+//aggiunta del parametro dell'API
+int MMB::addParameter(MMBParameter& parameter) { //DA MODIFICARE E INSERIRE LA POSSIBILITA' DI GESTIRE INSERIMENTO E RIMOZIONE, RICERCA ...
+
+	if (_pos < MAX_PARAMETER) {
+		_params[_pos] = &parameter;
+
+		_pos++;
+
+		return 1;
+	} else {
+		return 0;
+	}
+
+}
+
 
 
 //---PRIVATE---
+
+//costruisce l'url della risorsa (API) con i parametri
 char *MMB::buildResourceURL() {
 
 	//concateno le varie parti dell'URL
@@ -104,6 +101,36 @@ char *MMB::buildResourceURL() {
 	resource = strcat(resource, _account);
 	resource = strcat(resource, "/\0"); //aggiunto \0 per fix
 	resource = strcat(resource, _api);
+
+	if (_pos != 0) { //esistono parametri da valutare
+
+		const char *uri_template[_pos];
+		char *query_string = "/\0";
+
+		for (int i = 0; i < _pos; i++) { //scorro tutti i parametri
+
+			if ((*_params[i]).getType() == MMB_PARAMETER_X_WWW_FORM_URLENCODED) {
+				uri_template[(*_params[i]).getPosition()] = (*_params[i]).getValue();
+			
+			} else if ((*_params[i]).getType() == MMB_PARAMETER_QUERY_STRING) {
+
+				if (query_string[0] == '/') { //se query string è vuota
+
+					query_string = strcat(query_string, (*_params[i]).getOffset());
+					query_string = strcat(query_string, "=\0");
+					query_string = strcat(query_string, (*_params[i]).getValue());
+
+				} else { //altrimenti concateno
+
+					query_string = strcat(query_string, "&\0");
+					query_string = strcat(query_string, (*_params[i]).getOffset());
+					query_string = strcat(query_string, "=\0");
+					query_string = strcat(query_string, (*_params[i]).getValue());
+				}
+
+			}
+		}
+	}
 
 	return resource;
 
