@@ -21,32 +21,27 @@
 class MMBParameter {
 
 	public:
-		MMBParameter(const int type, const char *offset); //constructor
-		MMBParameter(const int type, const char *offset, const char *value); //constructor
-		MMBParameter(const int type, const int position); //constructor
-		MMBParameter(const int type, const int position, const char *value); //constructor
+		MMBParameter(int type, char *offset, char *value); //constructor
+		MMBParameter(int type, int position, char *value); //constructor
 		~MMBParameter(); //destroyer
-
-		//set
-		void setValue(const char *value);
 
 		//get
 		int getType();
-		const char *getOffset();
+		char *getOffset();
 		int getPosition();
-		const char *getValue();
+		char *getValue();
 
 
 
 	private:
 
-		MMBParameter(const int type, const char *offset, const int position, const char *value);
+		MMBParameter(int type, char *offset, int position, char *value);
 
 		int _type; //tipo di parametro
-		const char *_offset; //offset
+		char *_offset; //offset
 
 		int _position; //position se usato (URI_TEMPLATE)
-		const char *_value; //value se usato (QUERY_STRING o X_WWW_FORM_URLENCODED)
+		char *_value; //value se usato (QUERY_STRING o X_WWW_FORM_URLENCODED)
 
 
 

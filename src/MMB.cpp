@@ -17,12 +17,12 @@ MMB::~MMB() {
 }
 
 //save account name
-void MMB::setAccountName(const char *account) {
+void MMB::setAccountName(char *account) {
 	_account = account;
 }
 
 //save API name
-void MMB::setAPIName(const char *api) {
+void MMB::setAPIName(char *api) {
 	_api = api;
 }
 
@@ -31,30 +31,30 @@ int MMB::run() {
 	debugPrint("Running...............");
 
 	//costruisco l'URL della risorsa da chiamare
-	char *resource = buildResourceURL();
+	buildResourceURL();
 
 	debugPrint("\nRESOURCE: ");
-	debugPrint(resource);
+	debugPrint(_resource);
 	debugPrint("\n");
 
 	//status code
-	int status = _http.get(MMB_API_HOSTNAME, resource);
+	// int status = _http.get(MMB_API_HOSTNAME, resource);
 
-	if (status == 0) {
-		debugPrint("OK\n");
-		status = _http.responseStatusCode();
-		debugPrint("STATUS CODE: " + String(status));
+	// if (status == 0) {
+	// 	debugPrint("OK\n");
+	// 	status = _http.responseStatusCode();
+	// 	debugPrint("STATUS CODE: " + String(status));
 
-		//skip ResponseHeader
-		_http.skipResponseHeaders();
+	// 	//skip ResponseHeader
+	// 	_http.skipResponseHeaders();
 
 
-	} else {
-		debugPrint("ERROR\n");
-		debugPrint("ERROR: " + String(status));
+	// } else {
+	// 	debugPrint("ERROR\n");
+	// 	debugPrint("ERROR: " + String(status));
 
-		return status; //ritorno il codice di errore
-	}
+	// 	return status; //ritorno il codice di errore
+	// }
 
 }
 
@@ -92,47 +92,97 @@ int MMB::addParameter(MMBParameter& parameter) { //DA MODIFICARE E INSERIRE LA P
 //---PRIVATE---
 
 //costruisce l'url della risorsa (API) con i parametri
-char *MMB::buildResourceURL() {
+void MMB::buildResourceURL() {
 
-	//concateno le varie parti dell'URL
-	char *resource = "/"; //parto dalla root
+	//inizializzo _resource
+	_resource[0] = '/';
+	_resource[1] = 0;
 
 	//concateno gli elementi fissi dell'URL
-	resource = strcat(resource, _account);
-	resource = strcat(resource, "/\0"); //aggiunto \0 per fix
-	resource = strcat(resource, _api);
+	strcat(_resource, _account);
+	strcat(_resource, "/\0"); //aggiunto \0 per fix
+	strcat(_resource, _api);
 
-	if (_pos != 0) { //esistono parametri da valutare
+	debugPrint("hey");
 
-		const char *uri_template[_pos];
-		char *query_string = "/\0";
+	// if (_pos != 0) { //esistono parametri da valutare
 
-		for (int i = 0; i < _pos; i++) { //scorro tutti i parametri
+	// 	char uri_template[_pos][];
 
-			if ((*_params[i]).getType() == MMB_PARAMETER_X_WWW_FORM_URLENCODED) {
-				uri_template[(*_params[i]).getPosition()] = (*_params[i]).getValue();
+	// 	//inizializzo uritemplate
+	// 	for (int i = 0; i < _pos; i++) {
+	// 		uri_template[i] = "\0";
+	// 	}
+
+	// 	char *query_string = "/?\0";
+
+	// 	debugPrint(String("\n\nQUERY STRING: "));
+	// 	//debugPrint(query_string);
+	// 	debugPrint("\n\n");
+
+	// 	for (int i = 0; i < _pos; i++) { //scorro tutti i parametri
+
+	// 		if ((*_params[i]).getType() == MMB_PARAMETER_X_WWW_FORM_URLENCODED) {
+	// 			uri_template[(*_params[i]).getPosition()] = (*_params[i]).getValue();
 			
-			} else if ((*_params[i]).getType() == MMB_PARAMETER_QUERY_STRING) {
+	// 		} else if ((*_params[i]).getType() == MMB_PARAMETER_QUERY_STRING) {
 
-				if (query_string[0] == '/') { //se query string è vuota
+	// 			if (query_string[0] == '/') { //se query string è vuota
 
-					query_string = strcat(query_string, (*_params[i]).getOffset());
-					query_string = strcat(query_string, "=\0");
-					query_string = strcat(query_string, (*_params[i]).getValue());
+	// 				query_string = strcat(query_string, buildQueryStringParameter((*_params[i]).getOffset(), (*_params[i]).getValue()));
+					
 
-				} else { //altrimenti concateno
+	// 			} else { //altrimenti concateno
 
-					query_string = strcat(query_string, "&\0");
-					query_string = strcat(query_string, (*_params[i]).getOffset());
-					query_string = strcat(query_string, "=\0");
-					query_string = strcat(query_string, (*_params[i]).getValue());
-				}
+	// 				query_string = strcat(query_string, "&\0");
+	// 				query_string = strcat(query_string, (*_params[i]).getOffset());
+	// 				query_string = strcat(query_string, "=\0");
+	// 				query_string = strcat(query_string, (*_params[i]).getValue());
+	// 			}
 
-			}
-		}
-	}
+	// 		}
+	// 	}
 
-	return resource;
+	// 	debugPrint("\nQUERY STRING: ");
+	// 	debugPrint(query_string);
+	// 	debugPrint("\n");
+
+	// 	char *uri_template_string = "\0";
+
+	// 	for (int i = 0; i < _pos; i++) {
+
+	// 		if (uri_template[i][0] != '\0') {
+	// 			uri_template_string = strcat(uri_template_string, "/");
+	// 			uri_template_string = strcat(uri_template_string, uri_template[i]);
+	// 		}
+
+	// 	}
+
+	// 	//concateno resource con uri_template_string
+	// 	resource = strcat(resource, uri_template_string);
+
+	// 	se query_string non è vuota la concateno
+	// 	if (query_string[0] != '/') {
+	// 		resource = strcat(resource, query_string);
+	// 	}
+
+	// }
+
+}
+
+//costruisce e restituisce un parametro query string
+void MMB::buildQueryStringParameter(char *offset, char *value) {
+
+	// char *parameter;
+
+	// parameter = strcat(offset, "=");
+	// parameter = strcat(parameter, value);
+
+	// debugPrint("\n\nPARAMETER:  ");
+	// debugPrint(parameter);
+	// debugPrint("\n\n");
+
+	// //return parameter;
 
 }
 
