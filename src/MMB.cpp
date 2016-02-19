@@ -6,9 +6,14 @@
 
 //costructor and create _http client
 MMB::MMB(Client& client): _http(client) {
-	_client = &client; //save instance of client
+	
+	//inizializzo i buffer
+	_accountName[0] = 0;
+	_apiName[0] = 0;
 
-	_pos = 0;
+	_queryString[0] = 0;
+	_uriTemplate[0] = 0;
+	_xWWWFormUrlencoded[0] = 0;
 }
 
 //destroyer
@@ -16,49 +21,36 @@ MMB::~MMB() {
 
 }
 
-//save account name
-void MMB::setAccountName(char *account) {
-	_account = account;
+//---SET FUNZIONI INIZIALI
+void MMB::setAccountName(char *account) { //account name
+	strcpy(_accountName, account);
 }
 
-//save API name
-void MMB::setAPIName(char *api) {
-	_api = api;
+void MMB::setAPIName(char *api) { //api name
+	strcpy(_apiName, api);
 }
 
-//execute API
-int MMB::run() {
-	debugPrint("Running...............");
+//---AGGIUNTA PARAMETRI API
+void MMB::addQueryStringParameter(char *offset, char *value) { //query string
 
-	//costruisco l'URL della risorsa da chiamare
-	buildResourceURL();
+	//se non è il primo parametro che inserisco
+	if (_queryString[0] != 0) { //se query string è vuota
+		strcat(_queryString, "&\0");
+	}
 
-	debugPrint("\nRESOURCE: ");
-	debugPrint(_resource);
-	debugPrint("\n");
-
-	//status code
-	// int status = _http.get(MMB_API_HOSTNAME, resource);
-
-	// if (status == 0) {
-	// 	debugPrint("OK\n");
-	// 	status = _http.responseStatusCode();
-	// 	debugPrint("STATUS CODE: " + String(status));
-
-	// 	//skip ResponseHeader
-	// 	_http.skipResponseHeaders();
-
-
-	// } else {
-	// 	debugPrint("ERROR\n");
-	// 	debugPrint("ERROR: " + String(status));
-
-	// 	return status; //ritorno il codice di errore
-	// }
+	buildQueryStringParameter(_queryString, offset, value);
 
 }
 
-//lettura risposta
+void MMB::addUriTemplateParameter(char *value) { //uri template //DEVONO ESSERE INSERITI IN ORDINE
+	strcat(_uriTemplate, value);
+}
+
+void MMB::addXWWWFormUrlencodedParameter(char *offset, char *value) { //x-www-form-urlencoded
+
+}
+
+//---LETTURA DELLA RISPOSTA
 int MMB::available() {
 	return _http.available();
 }
@@ -71,18 +63,38 @@ void MMB::close() {
 	return _http.stop();
 }
 
+//---ESECUZIONE API (CHIAMATA HTTP)
+int MMB::run() {
+	debugPrint("Running...............");
 
-//aggiunta del parametro dell'API
-int MMB::addParameter(MMBParameter& parameter) { //DA MODIFICARE E INSERIRE LA POSSIBILITA' DI GESTIRE INSERIMENTO E RIMOZIONE, RICERCA ...
+	//creo e inizializzo url
+	char url[API_URL_MAX_LENGTH];
+	url[0] = 0;
 
-	if (_pos < MAX_PARAMETER) {
-		_params[_pos] = &parameter;
+	buildApiURL(url);
 
-		_pos++;
+	debugPrint("\nURL: ");
+	debugPrint(url);
+	debugPrint("\n");
 
-		return 1;
+
+	//status code
+	int status = _http.get(MMB_API_HOSTNAME, url);
+
+	if (status == 0) {
+
+		debugPrint("OK\n");
+		status = _http.responseStatusCode();
+		debugPrint("STATUS CODE: " + String(status));
+
+		//skip ResponseHeader
+		_http.skipResponseHeaders();
+
 	} else {
-		return 0;
+		debugPrint("ERROR\n");
+		debugPrint("ERROR: " + String(status));
+
+		return status; //ritorno il codice di errore
 	}
 
 }
@@ -92,109 +104,82 @@ int MMB::addParameter(MMBParameter& parameter) { //DA MODIFICARE E INSERIRE LA P
 //---PRIVATE---
 
 //costruisce l'url della risorsa (API) con i parametri
-void MMB::buildResourceURL() {
+void MMB::buildApiURL(char * url) {
 
-	//inizializzo _resource
-	_resource[0] = '/';
-	_resource[1] = 0;
+	//---BASE URL
+	strcat(url, "/");
+	strcat(url, _accountName);
+	strcat(url, "/");
+	strcat(url, _apiName);
 
-	//concateno gli elementi fissi dell'URL
-	strcat(_resource, _account);
-	strcat(_resource, "/\0"); //aggiunto \0 per fix
-	strcat(_resource, _api);
+	//---AGGIUNTA URI TEMPLATE
+	if (_uriTemplate[0] != 0) {
+		strcat(url, "/");
+		strcat(url, _uriTemplate);
+	}
 
-	debugPrint("hey");
-
-	// if (_pos != 0) { //esistono parametri da valutare
-
-	// 	char uri_template[_pos][];
-
-	// 	//inizializzo uritemplate
-	// 	for (int i = 0; i < _pos; i++) {
-	// 		uri_template[i] = "\0";
-	// 	}
-
-	// 	char *query_string = "/?\0";
-
-	// 	debugPrint(String("\n\nQUERY STRING: "));
-	// 	//debugPrint(query_string);
-	// 	debugPrint("\n\n");
-
-	// 	for (int i = 0; i < _pos; i++) { //scorro tutti i parametri
-
-	// 		if ((*_params[i]).getType() == MMB_PARAMETER_X_WWW_FORM_URLENCODED) {
-	// 			uri_template[(*_params[i]).getPosition()] = (*_params[i]).getValue();
-			
-	// 		} else if ((*_params[i]).getType() == MMB_PARAMETER_QUERY_STRING) {
-
-	// 			if (query_string[0] == '/') { //se query string è vuota
-
-	// 				query_string = strcat(query_string, buildQueryStringParameter((*_params[i]).getOffset(), (*_params[i]).getValue()));
-					
-
-	// 			} else { //altrimenti concateno
-
-	// 				query_string = strcat(query_string, "&\0");
-	// 				query_string = strcat(query_string, (*_params[i]).getOffset());
-	// 				query_string = strcat(query_string, "=\0");
-	// 				query_string = strcat(query_string, (*_params[i]).getValue());
-	// 			}
-
-	// 		}
-	// 	}
-
-	// 	debugPrint("\nQUERY STRING: ");
-	// 	debugPrint(query_string);
-	// 	debugPrint("\n");
-
-	// 	char *uri_template_string = "\0";
-
-	// 	for (int i = 0; i < _pos; i++) {
-
-	// 		if (uri_template[i][0] != '\0') {
-	// 			uri_template_string = strcat(uri_template_string, "/");
-	// 			uri_template_string = strcat(uri_template_string, uri_template[i]);
-	// 		}
-
-	// 	}
-
-	// 	//concateno resource con uri_template_string
-	// 	resource = strcat(resource, uri_template_string);
-
-	// 	se query_string non è vuota la concateno
-	// 	if (query_string[0] != '/') {
-	// 		resource = strcat(resource, query_string);
-	// 	}
-
-	// }
+	//---AGGIUNTA QUERY STRING
+	if (_queryString[0] != 0) {
+		strcat(url, "/?");
+		strcat(url, _queryString);
+	}
 
 }
 
 //costruisce e restituisce un parametro query string
-void MMB::buildQueryStringParameter(char *offset, char *value) {
+void MMB::buildQueryStringParameter(char *queryString, char *offset, char *value) {
 
-	// char *parameter;
-
-	// parameter = strcat(offset, "=");
-	// parameter = strcat(parameter, value);
-
-	// debugPrint("\n\nPARAMETER:  ");
-	// debugPrint(parameter);
-	// debugPrint("\n\n");
-
-	// //return parameter;
-
+	//inserisco il parametro 
+	strcat(queryString, offset);
+	strcat(queryString, "=\0");
+	strcat(queryString, value);
 }
+
+
+//---URLENCODE
+// static char MMB::hexDigit(char c) {
+// 	return "01234567890ABCDEF"[c & 0x0F];
+// }
+
+// char *MMB::urlencode(char *dst, char *src) {
+	
+// 	char *d = dst;
+  	
+//   	while (c = *src++) {
+//   		if (strchr(specials,c)) {  
+
+//   			*d++ = '%';
+// 			*d++ = hex_digit(c >> 4);
+// 			*d++ = hex_digit(c);
+// 		} else {
+// 			*d++ = c;
+// 		}
+// 	}
+	
+// 	return dst;
+// }
 
 
 //---DEBUG---
 void MMB::printDataDebug() {
 	Serial.println();
 	Serial.println("---------------DEBUG---------------");
-	Serial.print("ACCOUNT NAME: ");
-	Serial.println(_account);
-	Serial.print("API NAME: ");
-	Serial.println(_api);
+
+	Serial.print("BUFFER ACCOUNT NAME: ");
+	Serial.println(_accountName);
+
+	Serial.print("BUFFER API NAME: ");
+	Serial.println(_apiName);
+
+	Serial.print("BUFFER QUERY STRING PARAMS: ");
+	Serial.println(_queryString);
+
+	Serial.print("BUFFER URI TEMPLATE PARAMS: ");
+	Serial.println(_uriTemplate);
+
+	Serial.print("BUFFER X-WWW-FORM-URLENCODED PARAMS: ");
+	Serial.println(_xWWWFormUrlencoded);
+
 	Serial.println("---------------DEBUG---------------");
 	Serial.println();
 }

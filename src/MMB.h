@@ -9,17 +9,19 @@
 #include "Client.h"
 #include <HttpClient.h>
 
-#include "MMBParameter.h";
-
 
 //debug
 #define DEBUG 1
 
 #define MMB_API_HOSTNAME "api.mymicrobridge.com"
 
-#define MAX_PARAMETER 10 //numero massimo di parametri
-#define RESOURCE_BUFFER_DIMENSION 255 //dimensione dell'array per tenere l'URL della API
-#define RESOURCE_PARAMETER_BUFFER_DIMENSION 255
+#define API_URL_MAX_LENGTH 200 //buffer API URL
+#define QUERY_STRING_MAX_LENGTH 50 //buffer parametri query string
+#define URI_TEMPLATE_MAX_LENGTH 50 //buffer parametri uri template
+#define X_WWW_FORM_URLENCODED_MAX_LEGTH 50 //buffer parametri x-www-form-urlencoded
+
+#define API_NAME_MAX_LENGTH 25 //buffer API name
+#define ACCOUNT_NAME_MAX_LENGTH 25 //buffer account name
 
 //MMB class
 class MMB {
@@ -31,7 +33,7 @@ class MMB {
 		void setAccountName(char *account); //set account name
 		void setAPIName(char *api); //set API name
 
-		int run(); //execute API
+		int run(); //execute API (make HTTP request)
 
 		//lettura risposta
 		int available();
@@ -39,31 +41,37 @@ class MMB {
 		void close();
 
 		//aggiunta parametri
-		int addParameter(MMBParameter& parameter);
+		void addQueryStringParameter(char *offset, char *value); //query string
+		void addUriTemplateParameter(char *value); //uri template //DEVONO ESSERE INSERITI IN ORDINE
+		void addXWWWFormUrlencodedParameter(char *offset, char *value); //x-www-form-urlencoded
 
-
-		//---DEBUG---
+		//---DEBUG PUBLIC---
 		void printDataDebug();
-
-		void debugPrint(String msg);
 
 	private:
 
-		void buildResourceURL(); //build API URL
-		void buildQueryStringParameter(char *offset, char *value); //costruisce il parametro queryString
+		void buildApiURL(char *url); //build API URL
+		void buildQueryStringParameter(char *queryString, char *offset, char *value); //costruisce il parametro queryString
 
-		Client *_client; //net client (client passato)
+		//---URLENCODE
+		static char hexDigit(char c);
+		char *urlencode(char *dst, char *src);
+
+		//---DEBUG PRIVATE---
+		void debugPrint(String msg);
+
+		//---VARIABILI PRIVATE---
 		HttpClient _http; //http client (SimpleHttpClient library)
 
-		char *_account; //user account name
-		char *_api; //user API name
+		char _accountName[ACCOUNT_NAME_MAX_LENGTH]; //user account name
+		char _apiName[API_NAME_MAX_LENGTH]; //user API name
 
-		int _pos;
+		//buffer
+		char _queryString[QUERY_STRING_MAX_LENGTH];
+		char _uriTemplate[URI_TEMPLATE_MAX_LENGTH];
+		char _xWWWFormUrlencoded[X_WWW_FORM_URLENCODED_MAX_LEGTH];
 
-		MMBParameter *_params[MAX_PARAMETER]; //array per i parametri
-
-		char _resource[RESOURCE_ARRAY_DIMENSION]; //stringa per la risorsa
-
+		//char _specialCharcathers[] = "$&+,/:;=?@ <>#%{}|~[]`"; //String containing chars you want encoded
 
 
 };
