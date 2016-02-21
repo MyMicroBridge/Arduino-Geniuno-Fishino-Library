@@ -15,10 +15,10 @@
 
 #define MMB_API_HOSTNAME "api.mymicrobridge.com"
 
-#define API_URL_MAX_LENGTH 200 //buffer API URL
+#define API_URL_MAX_LENGTH 150 //buffer API URL
 #define QUERY_STRING_MAX_LENGTH 50 //buffer parametri query string
 #define URI_TEMPLATE_MAX_LENGTH 50 //buffer parametri uri template
-#define X_WWW_FORM_URLENCODED_MAX_LEGTH 50 //buffer parametri x-www-form-urlencoded
+#define X_WWW_FORM_URLENCODED_MAX_LEGTH 1 //buffer parametri x-www-form-urlencoded
 
 #define API_NAME_MAX_LENGTH 25 //buffer API name
 #define ACCOUNT_NAME_MAX_LENGTH 25 //buffer account name
@@ -27,6 +27,7 @@
 class MMB {
 	
 	public:
+
 		MMB(Client& client); //costructor
 		~MMB(); //destroyer
 
@@ -47,6 +48,7 @@ class MMB {
 
 		//---DEBUG PUBLIC---
 		void printDataDebug();
+
 
 	private:
 
