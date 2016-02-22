@@ -68,7 +68,7 @@ int MMB::run() {
 	debugPrint("Running...............");
 
 	//creo e inizializzo url
-	char url[API_URL_MAX_LENGTH];
+	char url[API_URL_SIZE];
 	url[0] = 0;
 
 	buildApiURL(url);

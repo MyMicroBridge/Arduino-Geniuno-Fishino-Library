@@ -15,13 +15,13 @@
 
 #define MMB_API_HOSTNAME "api.mymicrobridge.com"
 
-#define API_URL_MAX_LENGTH 150 //buffer API URL
-#define QUERY_STRING_MAX_LENGTH 50 //buffer parametri query string
-#define URI_TEMPLATE_MAX_LENGTH 50 //buffer parametri uri template
-#define X_WWW_FORM_URLENCODED_MAX_LEGTH 1 //buffer parametri x-www-form-urlencoded
+#define API_URL_SIZE 150 //buffer API URL
+#define QUERY_STRING_SIZE 50 //buffer parametri query string
+#define URI_TEMPLATE_SIZE 50 //buffer parametri uri template
+#define X_WWW_FORM_URLENCODED_SIZE 1 //buffer parametri x-www-form-urlencoded
 
-#define API_NAME_MAX_LENGTH 25 //buffer API name
-#define ACCOUNT_NAME_MAX_LENGTH 25 //buffer account name
+#define API_NAME_SIZE 25 //buffer API name
+#define ACCOUNT_NAME_SIZE 25 //buffer account name
 
 //MMB class
 class MMB {
@@ -65,13 +65,13 @@ class MMB {
 		//---VARIABILI PRIVATE---
 		HttpClient _http; //http client (SimpleHttpClient library)
 
-		char _accountName[ACCOUNT_NAME_MAX_LENGTH]; //user account name
-		char _apiName[API_NAME_MAX_LENGTH]; //user API name
+		char _accountName[ACCOUNT_NAME_SIZE]; //user account name
+		char _apiName[API_NAME_SIZE]; //user API name
 
 		//buffer
-		char _queryString[QUERY_STRING_MAX_LENGTH];
-		char _uriTemplate[URI_TEMPLATE_MAX_LENGTH];
-		char _xWWWFormUrlencoded[X_WWW_FORM_URLENCODED_MAX_LEGTH];
+		char _queryString[QUERY_STRING_SIZE];
+		char _uriTemplate[URI_TEMPLATE_SIZE];
+		char _xWWWFormUrlencoded[X_WWW_FORM_URLENCODED_SIZE];
 
 		//char _specialCharcathers[] = "$&+,/:;=?@ <>#%{}|~[]`"; //String containing chars you want encoded
 

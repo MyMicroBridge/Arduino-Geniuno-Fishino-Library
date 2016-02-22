@@ -5,29 +5,29 @@
 //---PUBLIC---
 
 //costruttore
-MMBJsonParser::MMBJsonParser(String *str) {
+MMBJsonParser::MMBJsonParser() {
 
-	//String message = str;
+	//message.toCharArray(_jsonMessage, JSON_MESSAGE_SIZE);
 
-	(*str).replace("\n", "");
-	(*str).replace("\t", "");
-	(*str).replace(" ", "");
+	// _jsonString.replace("\n", "");
+	// _jsonString.replace("\t", "");
+	// _jsonString.replace(" ", "");
 
-	debugPrint("----MESSAGE----\n");
+	//Serial.println("----MESSAGE----\n");
 
-	Serial.print(*str);
+	//Serial.print(_jsonMessage);
 
-	debugPrint("\n");
+	//debugPrint("\n");
 
-	//debugPrint("OK");
+	// //debugPrint("OK");
 
-	//creo json object
-	_json = &_jsonBuffer.parseObject((*str));
+	// //creo json object
+	// _json = &_jsonBuffer.parseObject(_jsonMessage);
 
 
-	if (!(*_json).success()) {
-		debugPrint("_json parseObject() failed\n");
-	}
+	// if (!(*_json).success()) {
+	// 	debugPrint("_json parseObject() failed\n");
+	// }
 
 }
 
@@ -36,17 +36,33 @@ MMBJsonParser::~MMBJsonParser() {
 
 }
 
+
+//---PARSE FUNCTION
+void MMBJsonParser::parseJson(char *message) {
+	debugPrint("\n\n---MESSAGE TO PARSE---\n\n");
+	debugPrint(message);
+
+	strcpy(_jsonMessage, message);
+	strcat(_jsonMessage, "\0");
+
+	//creo json object
+	_json = &_jsonBuffer.parseObject(_jsonMessage);
+
+
+	if (!(*_json).success()) {
+		debugPrint("_json parseObject() failed\n");
+	}
+}
+
+
 //---GET FUNCTION
 int MMBJsonParser::getStatusCode() {
-
-	//int value = (*_json)["responses"][0]["status"]["code"];
-
-	//debugPrint("STATUS_CODE_INTERNAL");
-	//debugPrint(String(value));
-
 	return (*_json)["responses"][0]["status"]["code"];
 }
 
+JsonVariant MMBJsonParser::getValue(char *key) {
+	return (*_json)["responses"][0]["data"]["default"]["value"];
+}
 
 //---DEBUG---
 void MMBJsonParser::debugPrint(String msg) {
