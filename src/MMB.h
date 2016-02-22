@@ -15,9 +15,9 @@
 
 #define MMB_API_HOSTNAME "api.mymicrobridge.com"
 
-#define API_URL_SIZE 150 //buffer API URL
-#define QUERY_STRING_SIZE 50 //buffer parametri query string
-#define URI_TEMPLATE_SIZE 50 //buffer parametri uri template
+#define API_URL_SIZE 60 //buffer API URL
+#define QUERY_STRING_SIZE 1 //buffer parametri query string
+#define URI_TEMPLATE_SIZE 1 //buffer parametri uri template
 #define X_WWW_FORM_URLENCODED_SIZE 1 //buffer parametri x-www-form-urlencoded
 
 #define API_NAME_SIZE 25 //buffer API name

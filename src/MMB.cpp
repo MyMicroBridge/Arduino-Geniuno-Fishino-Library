@@ -65,7 +65,7 @@ void MMB::close() {
 
 //---ESECUZIONE API (CHIAMATA HTTP)
 int MMB::run() {
-	debugPrint("Running...............");
+	debugPrint(F("Running..............."));
 
 	//creo e inizializzo url
 	char url[API_URL_SIZE];
@@ -73,9 +73,9 @@ int MMB::run() {
 
 	buildApiURL(url);
 
-	debugPrint("\nURL: ");
+	debugPrint(F("\nURL: "));
 	debugPrint(url);
-	debugPrint("\n");
+	debugPrint(F("\n"));
 
 
 	//status code
@@ -83,16 +83,18 @@ int MMB::run() {
 
 	if (status == 0) {
 
-		debugPrint("OK\n");
+		debugPrint(F("OK\n"));
 		status = _http.responseStatusCode();
-		debugPrint("STATUS CODE: " + String(status));
+		debugPrint(F("STATUS CODE: "));
+		debugPrint(String(status));
 
 		//skip ResponseHeader
 		_http.skipResponseHeaders();
 
 	} else {
-		debugPrint("ERROR\n");
-		debugPrint("ERROR: " + String(status));
+		debugPrint(F("ERROR\n"));
+		debugPrint(F("ERROR: "));
+		debugPrint(String(status));
 
 		return status; //ritorno il codice di errore
 	}
@@ -163,24 +165,24 @@ void MMB::buildQueryStringParameter(char *queryString, char *offset, char *value
 //---DEBUG---
 void MMB::printDataDebug() {
 	Serial.println();
-	Serial.println("---------------DEBUG---------------");
+	Serial.println(F("---------------DEBUG---------------"));
 
-	Serial.print("BUFFER ACCOUNT NAME: ");
+	Serial.print(F("BUFFER ACCOUNT NAME: "));
 	Serial.println(_accountName);
 
-	Serial.print("BUFFER API NAME: ");
+	Serial.print(F("BUFFER API NAME: "));
 	Serial.println(_apiName);
 
-	Serial.print("BUFFER QUERY STRING PARAMS: ");
+	Serial.print(F("BUFFER QUERY STRING PARAMS: "));
 	Serial.println(_queryString);
 
-	Serial.print("BUFFER URI TEMPLATE PARAMS: ");
+	Serial.print(F("BUFFER URI TEMPLATE PARAMS: "));
 	Serial.println(_uriTemplate);
 
-	Serial.print("BUFFER X-WWW-FORM-URLENCODED PARAMS: ");
+	Serial.print(F("BUFFER X-WWW-FORM-URLENCODED PARAMS: "));
 	Serial.println(_xWWWFormUrlencoded);
 
-	Serial.println("---------------DEBUG---------------");
+	Serial.println(F("---------------DEBUG---------------"));
 	Serial.println();
 }
 

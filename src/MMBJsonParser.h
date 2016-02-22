@@ -8,7 +8,7 @@
 #include "Arduino.h"
 #include <ArduinoJson.h>
 
-#define JSON_MESSAGE_SIZE 200
+#define JSON_MESSAGE_SIZE 120
 //#define JSON_BUFFER_SIZE 200;
 
 //debug
@@ -25,6 +25,7 @@ class MMBJsonParser {
 
 		//---PASE FUNCTION
 		void parseJson(char *message);
+		void parseJson(String message);
 
 
 		//---GET FUNCTION
