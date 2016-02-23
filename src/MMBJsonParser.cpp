@@ -7,6 +7,12 @@
 //costruttore
 MMBJsonParser::MMBJsonParser() {
 
+	//inserisco il terminatore in _jsonMessage
+	_jsonMessage[0] = 0;
+
+	//azzero l'indice
+	_index = 0;
+
 	//message.toCharArray(_jsonMessage, JSON_MESSAGE_SIZE);
 
 	// _jsonString.replace("\n", "");
@@ -65,10 +71,24 @@ void MMBJsonParser::parseJson(String message) { //elimino \n \t e spazi
 
 
 
-	message.toCharArray(_jsonMessage, JSON_MESSAGE_SIZE);
+	message.toCharArray(_jsonMessage, JSON_MESSAGE_INITIAL_SIZE);
 
 	//strcpy(_jsonMessage, message);
 	//strcat(_jsonMessage, "\0");
+
+	//creo json object
+	_json = &_jsonBuffer.parseObject(_jsonMessage);
+
+
+	if (!(*_json).success()) {
+		debugPrint(F("_json parseObject() failed\n"));
+	}
+}
+
+void MMBJsonParser::parseJson() { //elimino \n \t e spazi
+
+	debugPrint(F("\n\n---MESSAGE TO PARSE---\n\n"));
+	debugPrint(_jsonMessage);
 
 	//creo json object
 	_json = &_jsonBuffer.parseObject(_jsonMessage);
@@ -87,6 +107,19 @@ int MMBJsonParser::getStatusCode() {
 
 JsonVariant MMBJsonParser::getValue(char *key) {
 	return (*_json)["responses"][0]["data"]["default"]["value"];
+}
+
+
+//---ADD FUNCTION
+void MMBJsonParser::addCharacter(char c) {
+
+	if (c == '\n'  || c == '\t' || c == ' ') {
+		return;
+	}
+
+	_jsonMessage[_index++] = c;
+	_jsonMessage[_index] = 0;
+
 }
 
 //---DEBUG---

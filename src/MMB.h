@@ -15,13 +15,14 @@
 
 #define MMB_API_HOSTNAME "api.mymicrobridge.com"
 
-#define API_URL_SIZE 60 //buffer API URL
-#define QUERY_STRING_SIZE 1 //buffer parametri query string
-#define URI_TEMPLATE_SIZE 1 //buffer parametri uri template
-#define X_WWW_FORM_URLENCODED_SIZE 1 //buffer parametri x-www-form-urlencoded
+// #define API_URL_INITIAL_SIZE 60 //buffer API URL (DA RIMUOVERE)
 
-#define API_NAME_SIZE 25 //buffer API name
-#define ACCOUNT_NAME_SIZE 25 //buffer account name
+#define QUERY_STRING_INITIAL_SIZE 20 //buffer parametri query string
+#define URI_TEMPLATE_INITIAL_SIZE 20 //buffer parametri uri template
+// #define X_WWW_FORM_URLENCODED_INITIAL_SIZE 1 //buffer parametri x-www-form-urlencoded
+
+#define ACCOUNT_NAME_INITIAL_SIZE 20 //buffer account name
+#define API_NAME_INITIAL_SIZE 20 //buffer API name
 
 //MMB class
 class MMB {
@@ -44,10 +45,12 @@ class MMB {
 		//aggiunta parametri
 		void addQueryStringParameter(char *offset, char *value); //query string
 		void addUriTemplateParameter(char *value); //uri template //DEVONO ESSERE INSERITI IN ORDINE
-		void addXWWWFormUrlencodedParameter(char *offset, char *value); //x-www-form-urlencoded
+		// void addXWWWFormUrlencodedParameter(char *offset, char *value); //x-www-form-urlencoded
 
-		//---DEBUG PUBLIC---
-		void printDataDebug();
+		#ifdef DEBUG
+			//---DEBUG PUBLIC---
+			void printDataDebug();
+		#endif
 
 
 	private:
@@ -55,25 +58,45 @@ class MMB {
 		void buildApiURL(char *url); //build API URL
 		void buildQueryStringParameter(char *queryString, char *offset, char *value); //costruisce il parametro queryString
 
-		//---URLENCODE
-		static char hexDigit(char c);
-		char *urlencode(char *dst, char *src);
+		//---EXECUTE
+		int execute(char *url); //segue la chiamata
 
-		//---DEBUG PRIVATE---
-		void debugPrint(String msg);
+
+		//---RESIZE BUFFER
+		char *resizeBuffer(char *buffer, int oldDim, int newDim);
+
+		//---URLENCODE
+		// static char hexDigit(char c);
+		// char *urlencode(char *dst, char *src);
 
 		//---VARIABILI PRIVATE---
 		HttpClient _http; //http client (SimpleHttpClient library)
 
-		char _accountName[ACCOUNT_NAME_SIZE]; //user account name
-		char _apiName[API_NAME_SIZE]; //user API name
+		char *_accountName; //user account name
+		int _accountNameSize; //dimensione buffer
 
-		//buffer
-		char _queryString[QUERY_STRING_SIZE];
-		char _uriTemplate[URI_TEMPLATE_SIZE];
-		char _xWWWFormUrlencoded[X_WWW_FORM_URLENCODED_SIZE];
+		char *_apiName; //user API name
+		int _apiNameSize; //dimensione buffer
+
+		//buffer QueryString
+		char *_queryString;
+		int _queryStringSize;
+		int _queryStringPos;
+
+		//bufferUriTemplate
+		char *_uriTemplate;
+		int _uriTemplateSize;
+		int _uriTemplatePos;
+
+		//char *_xWWWFormUrlencoded;
 
 		//char _specialCharcathers[] = "$&+,/:;=?@ <>#%{}|~[]`"; //String containing chars you want encoded
+
+
+		#ifdef DEBUG
+			//---DEBUG PRIVATE---
+			void debugPrint(String msg);
+		#endif
 
 
 };
