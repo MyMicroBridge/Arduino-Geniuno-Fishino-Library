@@ -10,7 +10,7 @@
 #include <ArduinoJson.h>
 
 //debug
-#define DEBUG 1
+//#define DEBUG 1
 
 #define JSON_MESSAGE_INITIAL_SIZE 130
 

@@ -71,9 +71,6 @@ class MMB {
 		//---RESIZE BUFFER
 		char *resizeBuffer(char *buffer, int oldDim, int newDim);
 
-		//---URLENCODE
-		// static char hexDigit(char c);
-		// char *urlencode(char *dst, char *src);
 
 		//---VARIABILI PRIVATE---
 		HttpClient _http; //http client (SimpleHttpClient library)
@@ -97,8 +94,6 @@ class MMB {
 		char *_xWWWFormUrlencoded;
 		int _xWWWFormUrlencodedSize;
 		int _xWWWFormUrlencodedPos;
-
-		//char _specialCharcathers[] = "$&+,/:;=?@ <>#%{}|~[]`"; //String containing chars you want encoded
 
 
 		#ifdef DEBUG
