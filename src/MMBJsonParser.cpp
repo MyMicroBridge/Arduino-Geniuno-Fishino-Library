@@ -124,6 +124,10 @@ JsonVariant MMBJsonParser::getData(char *key, char *nspace) {
 	return (*_json)["responses"][0]["data"][nspace][key];
 }
 
+JsonVariant MMBJsonParser::getErrors(int index, char * nspace) {
+	return (*_json)["responses"][0]["errors"][nspace][index];
+}
+
 
 
 //---ADD FUNCTION
