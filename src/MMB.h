@@ -1,5 +1,10 @@
 /*
 	MMB Library
+
+	MANCA GESTIONE PARAMETRI x-www-form-urlencoded
+	MANCA GESTIONE urlencode dei parametri querystring e x-www-form-urlencoded
+
+	MANCA GESTIONE ERRORI CHIAMATA
 */
 
 #ifndef MMB_H
@@ -11,7 +16,7 @@
 
 
 //debug
-#define DEBUG 1
+//#define DEBUG 1
 
 #define MMB_API_HOSTNAME "api.mymicrobridge.com"
 
@@ -19,7 +24,7 @@
 
 #define QUERY_STRING_INITIAL_SIZE 20 //buffer parametri query string
 #define URI_TEMPLATE_INITIAL_SIZE 20 //buffer parametri uri template
-// #define X_WWW_FORM_URLENCODED_INITIAL_SIZE 1 //buffer parametri x-www-form-urlencoded
+#define X_WWW_FORM_URLENCODED_INITIAL_SIZE 1 //buffer parametri x-www-form-urlencoded
 
 #define ACCOUNT_NAME_INITIAL_SIZE 20 //buffer account name
 #define API_NAME_INITIAL_SIZE 20 //buffer API name
@@ -30,6 +35,7 @@ class MMB {
 	public:
 
 		MMB(Client& client); //costructor
+		MMB(Client& client, int accountNameBufferSize, int apiNameBufferSize, int queryStringBufferSize, int uriTemplateBufferSize, int xWWWFormUrlencodedBufferSize); //costructor
 		~MMB(); //destroyer
 
 		void setAccountName(char *account); //set account name
@@ -88,7 +94,9 @@ class MMB {
 		int _uriTemplateSize;
 		int _uriTemplatePos;
 
-		//char *_xWWWFormUrlencoded;
+		char *_xWWWFormUrlencoded;
+		int _xWWWFormUrlencodedSize;
+		int _xWWWFormUrlencodedPos;
 
 		//char _specialCharcathers[] = "$&+,/:;=?@ <>#%{}|~[]`"; //String containing chars you want encoded
 

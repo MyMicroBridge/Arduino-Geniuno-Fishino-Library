@@ -4,33 +4,39 @@
 
 //---PUBLIC---
 
+MMB::MMB(Client& client): MMB(client, ACCOUNT_NAME_INITIAL_SIZE, API_NAME_INITIAL_SIZE, QUERY_STRING_INITIAL_SIZE, URI_TEMPLATE_INITIAL_SIZE, X_WWW_FORM_URLENCODED_INITIAL_SIZE) {}
+
 //costructor and create _http client
-MMB::MMB(Client& client): _http(client) {
+MMB::MMB(Client& client, int accountNameBufferSize, int apiNameBufferSize, int queryStringBufferSize, int uriTemplateBufferSize, int xWWWFormUrlencodedBufferSize): _http(client) {
 
 	//inizializzo i buffer
 
 	//apiName
-	_apiName = (char *) malloc(API_NAME_INITIAL_SIZE * sizeof(char)); //alloco la memoria
-	_apiNameSize = API_NAME_INITIAL_SIZE; //salvo la dimensione
+	_apiName = (char *) malloc(apiNameBufferSize * sizeof(char)); //alloco la memoria
+	_apiNameSize = apiNameBufferSize; //salvo la dimensione
 
 	//accountName
-	_accountName = (char *) malloc(ACCOUNT_NAME_INITIAL_SIZE * sizeof(char)); //alloco la memoria
-	_accountNameSize = ACCOUNT_NAME_INITIAL_SIZE; //salvo la dimensione
+	_accountName = (char *) malloc(accountNameBufferSize * sizeof(char)); //alloco la memoria
+	_accountNameSize = accountNameBufferSize; //salvo la dimensione
 
 	//queryString
-	_queryString = (char *) malloc(QUERY_STRING_INITIAL_SIZE * sizeof(char)); //alloco la memoria
-	_queryStringSize = QUERY_STRING_INITIAL_SIZE; //salvo la dimensione
+	_queryString = (char *) malloc(queryStringBufferSize * sizeof(char)); //alloco la memoria
+	_queryStringSize = queryStringBufferSize; //salvo la dimensione
 	_queryStringPos = 0; //posizione della stringa
 	_queryString[0] = 0; //inserisco il carattere vuoto all'inizio
 
 	//uriTemplate
-	_uriTemplate = (char *) malloc(URI_TEMPLATE_INITIAL_SIZE * sizeof(char)); //alloco la memoria
-	_uriTemplateSize = URI_TEMPLATE_INITIAL_SIZE; //salvo la dimensione
+	_uriTemplate = (char *) malloc(uriTemplateBufferSize * sizeof(char)); //alloco la memoria
+	_uriTemplateSize = uriTemplateBufferSize; //salvo la dimensione
 	_uriTemplatePos = 0; //posizione della stringa
 	_uriTemplate[0] = 0; //inserisco il carattere vuoto all'inizio
-	
 
-	// _xWWWFormUrlencoded[0] = 0;
+	//uriTemplate
+	_xWWWFormUrlencoded = (char *) malloc(xWWWFormUrlencodedBufferSize * sizeof(char)); //alloco la memoria
+	_xWWWFormUrlencodedSize = xWWWFormUrlencodedBufferSize; //salvo la dimensione
+	_xWWWFormUrlencodedPos = 0; //posizione della stringa
+	_xWWWFormUrlencoded[0] = 0; //inserisco il carattere vuoto all'inizio
+	
 }
 
 //destroyer
@@ -39,6 +45,10 @@ MMB::~MMB() {
 	//libero la memoria allocata dinamicamente
 	free(_accountName);
 	free(_apiName);
+
+	free(_queryString);
+	free(_uriTemplate);
+	free(_xWWWFormUrlencoded);
 
 }
 

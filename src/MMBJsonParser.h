@@ -1,5 +1,8 @@
 /*
-	MMB Library
+	MMBJsonParser Library
+	
+	MANCA LA GESTIONE DEGLI ERRORI
+
 */
 
 #ifndef MMBJSONPARSER_H
@@ -12,7 +15,12 @@
 //#define JSON_BUFFER_SIZE 200;
 
 //debug
-#define DEBUG 1
+//#define DEBUG 1
+
+//costanti per parsing JSON MMB
+#define API_EXECUTED_SUCCESFULLY 200
+
+//definisco gli errori
 
 
 class MMBJsonParser {
@@ -20,6 +28,7 @@ class MMBJsonParser {
 	public:
 
 		MMBJsonParser();
+		MMBJsonParser(int dim);
 		~MMBJsonParser(); //destroyer
 
 
@@ -30,20 +39,24 @@ class MMBJsonParser {
 
 		//---GET FUNCTION
 		int getStatusCode();
+		const char *getErrorMessage();
+		const char *getAPIName();
 
-		//---ADDE
+		JsonVariant getData(char *key);
+		JsonVariant getData(char *key, char *nspace);
+
+		//---ADD CHARACTER
 		void addCharacter(char c);
 
-		JsonVariant getValue(char *key);
+		//---CHECK IF PARSING IS SUCCESSED
+		uint8_t success();
+
 
 
 	private:
 
-		//---DEBUG PRIVATE---
-		void debugPrint(String msg);
-
-		char _jsonMessage[JSON_MESSAGE_INITIAL_SIZE];
-
+		//buffer messaggio
+		char *_jsonMessage;
 		int _index = 0;
 
 		//buffer Json
@@ -51,6 +64,13 @@ class MMBJsonParser {
 
 		//json object
 		JsonObject *_json;
+
+		uint8_t _parseSuccess;
+
+		#ifdef DEBUG
+			//---DEBUG PRIVATE---
+			void debugPrint(String msg);
+		#endif
 
 
 };

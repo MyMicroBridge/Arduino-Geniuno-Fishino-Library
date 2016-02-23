@@ -5,7 +5,11 @@
 //---PUBLIC---
 
 //costruttore
-MMBJsonParser::MMBJsonParser() {
+MMBJsonParser::MMBJsonParser():MMBJsonParser(JSON_MESSAGE_INITIAL_SIZE) {}
+
+MMBJsonParser::MMBJsonParser(int dim) {
+
+	_jsonMessage = (char *) malloc(dim * sizeof(char)); //alloco la memoria
 
 	//inserisco il terminatore in _jsonMessage
 	_jsonMessage[0] = 0;
@@ -13,50 +17,39 @@ MMBJsonParser::MMBJsonParser() {
 	//azzero l'indice
 	_index = 0;
 
-	//message.toCharArray(_jsonMessage, JSON_MESSAGE_SIZE);
-
-	// _jsonString.replace("\n", "");
-	// _jsonString.replace("\t", "");
-	// _jsonString.replace(" ", "");
-
-	//Serial.println("----MESSAGE----\n");
-
-	//Serial.print(_jsonMessage);
-
-	//debugPrint("\n");
-
-	// //debugPrint("OK");
-
-	// //creo json object
-	// _json = &_jsonBuffer.parseObject(_jsonMessage);
-
-
-	// if (!(*_json).success()) {
-	// 	debugPrint("_json parseObject() failed\n");
-	// }
-
+	//inizializzo il siccesso del parsing a 0
+	_parseSuccess = 0; //ci sono errori
 }
 
 //destroyer
 MMBJsonParser::~MMBJsonParser() {
-
+	free(_jsonMessage);
 }
 
 
 //---PARSE FUNCTION
 void MMBJsonParser::parseJson(char *message) { //devono essere già stati eliminati \n \t e spazi
-	debugPrint(F("\n\n---MESSAGE TO PARSE---\n\n"));
-	debugPrint(message);
+	
+	#ifdef DEBUG
+		debugPrint(F("\n\n---MESSAGE TO PARSE---\n\n"));
+		debugPrint(message);
+	#endif
 
 	strcpy(_jsonMessage, message);
-	//strcat(_jsonMessage, "\0");
 
 	//creo json object
 	_json = &_jsonBuffer.parseObject(_jsonMessage);
 
 
 	if (!(*_json).success()) {
-		debugPrint(F("_json parseObject() failed\n"));
+		#ifdef DEBUG
+			debugPrint(F("_json parseObject() failed\n"));
+		#endif
+
+		_parseSuccess = 0;
+
+	} else {
+		_parseSuccess = 1;
 	}
 }
 
@@ -66,8 +59,10 @@ void MMBJsonParser::parseJson(String message) { //elimino \n \t e spazi
 	message.replace("\t", "");
 	message.replace(" ", "");
 
-	debugPrint(F("\n\n---MESSAGE TO PARSE---\n\n"));
-	debugPrint(message);
+	#ifdef DEBUG
+		debugPrint(F("\n\n---MESSAGE TO PARSE---\n\n"));
+		debugPrint(message);
+	#endif
 
 
 
@@ -81,21 +76,37 @@ void MMBJsonParser::parseJson(String message) { //elimino \n \t e spazi
 
 
 	if (!(*_json).success()) {
-		debugPrint(F("_json parseObject() failed\n"));
+		#ifdef DEBUG
+			debugPrint(F("_json parseObject() failed\n"));
+		#endif
+		
+		_parseSuccess = 0;
+
+	} else {
+		_parseSuccess = 1;
 	}
 }
 
 void MMBJsonParser::parseJson() { //elimino \n \t e spazi
 
-	debugPrint(F("\n\n---MESSAGE TO PARSE---\n\n"));
-	debugPrint(_jsonMessage);
+	#ifdef DEBUG
+		debugPrint(F("\n\n---MESSAGE TO PARSE---\n\n"));
+		debugPrint(_jsonMessage);
+	#endif
 
 	//creo json object
 	_json = &_jsonBuffer.parseObject(_jsonMessage);
 
 
 	if (!(*_json).success()) {
-		debugPrint(F("_json parseObject() failed\n"));
+		#ifdef DEBUG
+			debugPrint(F("_json parseObject() failed\n"));
+		#endif
+		
+		_parseSuccess = 0;
+
+	} else {
+		_parseSuccess = 1;
 	}
 }
 
@@ -105,9 +116,22 @@ int MMBJsonParser::getStatusCode() {
 	return (*_json)["responses"][0]["status"]["code"];
 }
 
-JsonVariant MMBJsonParser::getValue(char *key) {
-	return (*_json)["responses"][0]["data"]["default"]["value"];
+const char *MMBJsonParser::getErrorMessage() {
+	return (*_json)["responses"][0]["status"]["message"];
 }
+
+const char *MMBJsonParser::getAPIName() {
+	return (*_json)["responses"][0]["status"]["api"];
+}
+
+JsonVariant MMBJsonParser::getData(char *key) {
+	return getData(key, "default");
+}
+
+JsonVariant MMBJsonParser::getData(char *key, char *nspace) {
+	return (*_json)["responses"][0]["data"][nspace][key];
+}
+
 
 
 //---ADD FUNCTION
@@ -122,11 +146,16 @@ void MMBJsonParser::addCharacter(char c) {
 
 }
 
-//---DEBUG---
-void MMBJsonParser::debugPrint(String msg) {
+//---SUCCESS
+uint8_t MMBJsonParser::success() {
+	return _parseSuccess;
+}
 
-	if (DEBUG) {
+#ifdef DEBUG
+	//---DEBUG---
+	void MMBJsonParser::debugPrint(String msg) {
 		Serial.print(msg);
 	}
+#endif
 
-}
+
