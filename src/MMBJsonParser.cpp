@@ -116,14 +116,6 @@ int MMBJsonParser::getStatusCode() {
 	return (*_json)["responses"][0]["status"]["code"];
 }
 
-const char *MMBJsonParser::getErrorMessage() {
-	return (*_json)["responses"][0]["status"]["message"];
-}
-
-const char *MMBJsonParser::getAPIName() {
-	return (*_json)["responses"][0]["status"]["api"];
-}
-
 JsonVariant MMBJsonParser::getData(char *key) {
 	return getData(key, "default");
 }
