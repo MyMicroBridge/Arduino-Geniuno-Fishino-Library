@@ -66,7 +66,7 @@ class MMBJsonParser {
 		JsonVariant getData(char *key);
 		JsonVariant getData(char *key, char *nspace);
 
-		sonVariant getErrors(int index, char *nspace);
+		JsonVariant getErrors(int index, char *nspace);
 
 		//---ADD CHARACTER
 		void addCharacter(char c);
