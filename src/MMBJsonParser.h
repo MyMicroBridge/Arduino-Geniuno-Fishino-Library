@@ -81,6 +81,7 @@ class MMBJsonParser {
 		//buffer messaggio
 		char *_jsonMessage;
 		int _index = 0;
+		uint8_t _openQuotes; //indica se è stato trovato il carattere"
 
 		//buffer Json
 		StaticJsonBuffer<200> _jsonBuffer;

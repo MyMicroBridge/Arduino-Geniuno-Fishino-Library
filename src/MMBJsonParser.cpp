@@ -17,6 +17,9 @@ MMBJsonParser::MMBJsonParser(int dim) {
 	//azzero l'indice
 	_index = 0;
 
+	//indica se ci sonon
+	_openQuotes = 0;
+
 	//inizializzo il siccesso del parsing a 0
 	_parseSuccess = 0; //ci sono errori
 }
@@ -133,8 +136,21 @@ JsonVariant MMBJsonParser::getErrors(int index, char * nspace) {
 //---ADD FUNCTION
 void MMBJsonParser::addCharacter(char c) {
 
-	if (c == '\n'  || c == '\t' || c == ' ') {
-		return;
+	if (c == '\"') {
+		_openQuotes = !_openQuotes;
+	}
+
+	if (_openQuotes) { //se ho già trovato \" devo tenere gli spazi
+
+		if (c == '\n'  || c == '\t') { //elimino i caratteri \n e \t
+			return;
+		}
+
+	} else { //altrimenti posso eliminarli
+
+		if (c == '\n'  || c == '\t' || c == ' ') { //elimino i caratteri \n \t e spazio
+			return;
+		}
 	}
 
 	_jsonMessage[_index++] = c;
