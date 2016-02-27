@@ -16,7 +16,7 @@
 
 
 //debug
-//#define DEBUG 1
+#define DEBUG 1
 
 #define MMB_API_HOSTNAME "api.mymicrobridge.com"
 
@@ -51,7 +51,7 @@ class MMB {
 		//aggiunta parametri
 		void addQueryStringParameter(char *offset, char *value); //query string
 		void addUriTemplateParameter(char *value); //uri template //DEVONO ESSERE INSERITI IN ORDINE
-		// void addXWWWFormUrlencodedParameter(char *offset, char *value); //x-www-form-urlencoded
+		void addXWWWFormUrlencodedParameter(char *offset, char *value); //x-www-form-urlencoded
 
 		#ifdef DEBUG
 			//---DEBUG PUBLIC---
@@ -62,15 +62,10 @@ class MMB {
 	private:
 
 		void buildApiURL(char *url); //build API URL
-		void buildQueryStringParameter(char *queryString, char *offset, char *value); //costruisce il parametro queryString
+		void buildUrlencodedParameter(char *queryString, char *offset, char *value); //costruisce il parametro queryString
 
 		//---EXECUTE
 		int execute(char *url); //segue la chiamata
-
-
-		//---RESIZE BUFFER
-		char *resizeBuffer(char *buffer, int oldDim, int newDim);
-
 
 		//---VARIABILI PRIVATE---
 		HttpClient _http; //http client (SimpleHttpClient library)

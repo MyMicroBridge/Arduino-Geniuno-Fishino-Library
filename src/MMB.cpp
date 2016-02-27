@@ -148,7 +148,7 @@ void MMB::addQueryStringParameter(char *offset, char *value) { //query string
 		_queryStringPos = _queryStringPos + strlen(offset) + strlen(value) +2; //pre-salvo la nuova posizione
 	}
 
-	buildQueryStringParameter(_queryString, offset, value); //aggiungo il parametro
+	buildUrlencodedParameter(_queryString, offset, value); //aggiungo il parametro
 
 }
 
@@ -210,9 +210,61 @@ void MMB::addUriTemplateParameter(char *value) { //uri template //DEVONO ESSERE 
 	
 }
 
-// void MMB::addXWWWFormUrlencodedParameter(char *offset, char *value) { //x-www-form-urlencoded
+void MMB::addXWWWFormUrlencodedParameter(char *offset, char *value) { //x-www-form-urlencoded
 
-// }
+	#ifdef DEBUG
+		debugPrint(F("\n SIZE OF _xWWWFormUrlencoded: "));
+		debugPrint(String(_xWWWFormUrlencodedSize));
+		debugPrint(F("\n POSITION _xWWWFormUrlencoded: "));
+		debugPrint(String(_xWWWFormUrlencodedPos));
+
+		debugPrint(F("\n SIZE OF data to insert: "));
+		debugPrint(String(strlen(offset) + strlen(value) +1));
+		debugPrint(F("\n"));
+	#endif
+
+
+	//se non è il primo parametro che inserisco
+	if (_xWWWFormUrlencoded[0] == 0) { //se query string è vuota
+
+		if ((_xWWWFormUrlencodedSize - _xWWWFormUrlencodedPos) < (strlen(offset) + strlen(value) +2)) {
+
+			//salvo il contenuto del buffer
+			char tempBuffer[_xWWWFormUrlencodedSize];
+			strcpy(tempBuffer, _xWWWFormUrlencoded);
+
+			//realloco il buffer e salvo la nuova dimensione
+			_xWWWFormUrlencoded = (char *) realloc(_xWWWFormUrlencoded, (_xWWWFormUrlencodedSize + strlen(offset) + strlen(value) +2) * sizeof(char));
+			_xWWWFormUrlencodedSize = _xWWWFormUrlencodedSize + strlen(offset) + strlen(value) +2;
+
+			//ricopio il contenuto del buffer
+			strcpy(_xWWWFormUrlencoded, tempBuffer);
+
+		}
+
+		_xWWWFormUrlencodedPos = _xWWWFormUrlencodedPos + strlen(offset) + strlen(value) +1; //pre-salvo la nuova posizione
+	} else {
+
+		if ((_xWWWFormUrlencodedSize - _xWWWFormUrlencodedPos) < (strlen(offset) + strlen(value) +3)) {
+			//salvo il contenuto del buffer
+			char tempBuffer[_xWWWFormUrlencodedSize];
+			strcpy(tempBuffer, _xWWWFormUrlencoded);
+
+			//realloco il buffer e salvo la nuova dimensione
+			_xWWWFormUrlencoded = (char *) realloc(_xWWWFormUrlencoded, (_xWWWFormUrlencodedSize + strlen(offset) + strlen(value) +3) * sizeof(char));
+			_xWWWFormUrlencodedSize = _xWWWFormUrlencodedSize + strlen(offset) + strlen(value) +3;
+
+			//ricopio il contenuto del buffer
+			strcpy(_xWWWFormUrlencoded, tempBuffer);
+		}
+
+		strcat(_xWWWFormUrlencoded, "&\0"); //aggiungo il carattere di separazione
+
+		_xWWWFormUrlencodedPos = _xWWWFormUrlencodedPos + strlen(offset) + strlen(value) +2; //pre-salvo la nuova posizione
+	}
+
+	buildUrlencodedParameter(_xWWWFormUrlencoded, offset, value); //aggiungo il parametro
+}
 
 //---LETTURA DELLA RISPOSTA
 int MMB::available() {
@@ -338,31 +390,8 @@ void MMB::buildApiURL(char * url) {
 
 }
 
-//---RESIZE BUFFER
-char *MMB::resizeBuffer(char *buffer, int oldDim, int newDim) {
-
-	//se la dimensione vecchia è maggiore o uguale a quella nuova non ridimensiono
-	if (oldDim >= newDim) {
-		return buffer;
-	}
-
-	char tempBuffer[oldDim];
-
-	//salvo il contenuto del vecchio buffer
-	strcpy(tempBuffer, buffer);
-
-	//rialloco il buffer
-	char *newBuffer = (char *) realloc(buffer, newDim * sizeof(char));
-
-	//ricopio il contenuto del buffer
-	strcpy(newBuffer, tempBuffer);
-
-	return newBuffer;
-}
-
-
 //costruisce e restituisce un parametro query string
-void MMB::buildQueryStringParameter(char *queryString, char *offset, char *value) {
+void MMB::buildUrlencodedParameter(char *queryString, char *offset, char *value) {
 
 	//inserisco il parametro 
 	strcat(queryString, offset);
@@ -389,8 +418,8 @@ void MMB::buildQueryStringParameter(char *queryString, char *offset, char *value
 		Serial.print(F("BUFFER URI TEMPLATE PARAMS: "));
 		Serial.println(_uriTemplate);
 
-		// Serial.print(F("BUFFER X-WWW-FORM-URLENCODED PARAMS: "));
-		// Serial.println(_xWWWFormUrlencoded);
+		Serial.print(F("BUFFER X-WWW-FORM-URLENCODED PARAMS: "));
+		Serial.println(_xWWWFormUrlencoded);
 
 		Serial.println(F("---------------DEBUG---------------"));
 		Serial.println();
