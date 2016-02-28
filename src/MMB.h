@@ -16,11 +16,9 @@
 
 
 //debug
-#define DEBUG 1
+//#define DEBUG 1
 
 #define MMB_API_HOSTNAME "api.mymicrobridge.com"
-
-// #define API_URL_INITIAL_SIZE 60 //buffer API URL (DA RIMUOVERE)
 
 #define QUERY_STRING_INITIAL_SIZE 20 //buffer parametri query string
 #define URI_TEMPLATE_INITIAL_SIZE 20 //buffer parametri uri template

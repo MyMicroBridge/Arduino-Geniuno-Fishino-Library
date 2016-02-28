@@ -332,23 +332,46 @@ int MMB::execute(char *url) {
 	#ifdef DEBUG
 		debugPrint(F("\nURL: "));
 		debugPrint(url);
-		debugPrint(F("\n"));
-
 		debugPrint(F("\nURL SIZE: "));
 		debugPrint(String(strlen(url) +1));
 		debugPrint(F("\n"));
 	#endif
 
-	//status code
-	int status = _http.get(MMB_API_HOSTNAME, url);
+	int status = 0;
+
+	if (_xWWWFormUrlencoded[0] != 0) { //chiamata POST (con body)
+
+		//---BEGIN REQUEST
+		_http.beginRequest();
+
+		//---MAKE POST REQUEST
+		status = _http.post(MMB_API_HOSTNAME, url);
+
+		//---SEND HEADER
+		_http.sendHeader("Content-Type",  "application/x-www-form-urlencoded");
+		_http.sendHeader("Content-Length", strlen(_xWWWFormUrlencoded));
+
+		//---END REQUEST
+		_http.endRequest();
+
+		//---SEND BODY
+		_http.println(_xWWWFormUrlencoded);
+
+	} else { //non esistono parametri da inviare nel body della richiesta (GET)
+
+		status = _http.get(MMB_API_HOSTNAME, url); //eseguo la richiesta e salvo lo status code
+	}
 
 	if (status == 0) {
 
+		//---PRINT STATUS CODE
 		#ifdef DEBUG
-			debugPrint(F("OK\n"));
+			debugPrint(F("SUCCESS!\n"));
 			status = _http.responseStatusCode();
 			debugPrint(F("STATUS CODE: "));
 			debugPrint(String(status));
+			debugPrint(F("\n"));
+			debugPrint(F("\n"));
 		#endif
 
 		//skip ResponseHeader
@@ -356,10 +379,13 @@ int MMB::execute(char *url) {
 
 	} else {
 
+		//---PRINT ERROR
 		#ifdef DEBUG
-			debugPrint(F("ERROR\n"));
+			debugPrint(F("ERROR!\n"));
 			debugPrint(F("ERROR: "));
 			debugPrint(String(status));
+			debugPrint(F("\n"));
+			debugPrint(F("\n"));
 		#endif
 
 		return status; //ritorno il codice di errore
