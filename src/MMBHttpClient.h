@@ -2,8 +2,8 @@
 // (c) Copyright MCQN Ltd. 2010-2012
 // Released under Apache License, version 2.0
 
-#ifndef HttpClient_h
-#define HttpClient_h
+#ifndef MMBHTTPCLIENT_H
+#define MMBHTTPCLIENT_H
 
 #include <Arduino.h>
 #include <IPAddress.h>
@@ -13,7 +13,7 @@ static const int HTTP_SUCCESS =0;
 // The end of the headers has been reached.  This consumes the '\n'
 // Could not connect to the server
 static const int HTTP_ERROR_CONNECTION_FAILED =-1;
-// This call was made when the HttpClient class wasn't expecting it
+// This call was made when the MMBHttpClient class wasn't expecting it
 // to be called.  Usually indicates your code is using the class
 // incorrectly
 static const int HTTP_ERROR_API =-2;
@@ -34,7 +34,7 @@ static const int HTTP_ERROR_INVALID_RESPONSE =-4;
 #define HTTP_HEADER_CONNECTION     "Connection"
 #define HTTP_HEADER_USER_AGENT     "User-Agent"
 
-class HttpClient : public Client
+class MMBHttpClient : public Client
 {
 public:
     static const int kNoContentLengthHeader =-1;
@@ -45,9 +45,9 @@ public:
 // FIXME Update tempToPachube example to calculate Content-Length correctly
 
 #ifdef PROXY_ENABLED // currently disabled as introduces dependency on Dns.h in Ethernet
-    HttpClient(Client& aClient, const char* aProxy =NULL, uint16_t aProxyPort =0);
+    MMBHttpClient(Client& aClient, const char* aProxy =NULL, uint16_t aProxyPort =0);
 #else
-    HttpClient(Client& aClient);
+    MMBHttpClient(Client& aClient);
 #endif
 
     /** Start a more complex request.

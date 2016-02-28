@@ -12,7 +12,7 @@
 
 #include "Arduino.h"
 #include "Client.h"
-#include "HttpClient.h"
+#include "MMBHttpClient.h"
 
 
 //debug
@@ -76,7 +76,7 @@ class MMB {
 		int execute(char *url); //segue la chiamata
 
 		//---VARIABILI PRIVATE---
-		HttpClient _http; //http client (SimpleHttpClient library)
+		MMBHttpClient _http; //http client (SimpleHttpClient library)
 
 		char *_accountName; //user account name
 		int _accountNameSize; //dimensione buffer

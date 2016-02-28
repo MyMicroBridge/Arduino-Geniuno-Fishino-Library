@@ -2,18 +2,18 @@
 // (c) Copyright 2010-2011 MCQN Ltd
 // Released under Apache License, version 2.0
 
-#include "HttpClient.h"
+#include "MMBHttpClient.h"
 #include "b64.h"
 #ifdef PROXY_ENABLED // currently disabled as introduces dependency on Dns.h in Ethernet
 #include <Dns.h>
 #endif
 
 // Initialize constants
-const char* HttpClient::kUserAgent = "Arduino/2.2.0";
-const char* HttpClient::kContentLengthPrefix = HTTP_HEADER_CONTENT_LENGTH ": ";
+const char* MMBHttpClient::kUserAgent = "Arduino/2.2.0";
+const char* MMBHttpClient::kContentLengthPrefix = HTTP_HEADER_CONTENT_LENGTH ": ";
 
 #ifdef PROXY_ENABLED // currently disabled as introduces dependency on Dns.h in Ethernet
-HttpClient::HttpClient(Client& aClient, const char* aProxy, uint16_t aProxyPort)
+MMBHttpClient::MMBHttpClient(Client& aClient, const char* aProxy, uint16_t aProxyPort)
  : iClient(&aClient), iProxyPort(aProxyPort)
 {
   resetState();
@@ -28,14 +28,14 @@ HttpClient::HttpClient(Client& aClient, const char* aProxy, uint16_t aProxyPort)
   }
 }
 #else
-HttpClient::HttpClient(Client& aClient)
+MMBHttpClient::MMBHttpClient(Client& aClient)
  : iClient(&aClient), iProxyPort(0)
 {
   resetState();
 }
 #endif
 
-void HttpClient::resetState()
+void MMBHttpClient::resetState()
 {
   iState = eIdle;
   iStatusCode = 0;
@@ -45,18 +45,18 @@ void HttpClient::resetState()
   iHttpResponseTimeout = kHttpResponseTimeout;
 }
 
-void HttpClient::stop()
+void MMBHttpClient::stop()
 {
   iClient->stop();
   resetState();
 }
 
-void HttpClient::beginRequest()
+void MMBHttpClient::beginRequest()
 {
   iState = eRequestStarted;
 }
 
-int HttpClient::startRequest(const char* aServerName, uint16_t aServerPort, const char* aURLPath, const char* aHttpMethod, const char* aUserAgent)
+int MMBHttpClient::startRequest(const char* aServerName, uint16_t aServerPort, const char* aURLPath, const char* aHttpMethod, const char* aUserAgent)
 {
     tHttpState initialState = iState;
     if ((eIdle != iState) && (eRequestStarted != iState))
@@ -99,7 +99,7 @@ int HttpClient::startRequest(const char* aServerName, uint16_t aServerPort, cons
     return ret;
 }
 
-int HttpClient::startRequest(const IPAddress& aServerAddress, const char* aServerName, uint16_t aServerPort, const char* aURLPath, const char* aHttpMethod, const char* aUserAgent)
+int MMBHttpClient::startRequest(const IPAddress& aServerAddress, const char* aServerName, uint16_t aServerPort, const char* aURLPath, const char* aHttpMethod, const char* aUserAgent)
 {
     tHttpState initialState = iState;
     if ((eIdle != iState) && (eRequestStarted != iState))
@@ -142,7 +142,7 @@ int HttpClient::startRequest(const IPAddress& aServerAddress, const char* aServe
     return ret;
 }
 
-int HttpClient::sendInitialHeaders(const char* aServerName, IPAddress aServerIP, uint16_t aPort, const char* aURLPath, const char* aHttpMethod, const char* aUserAgent)
+int MMBHttpClient::sendInitialHeaders(const char* aServerName, IPAddress aServerIP, uint16_t aPort, const char* aURLPath, const char* aHttpMethod, const char* aUserAgent)
 {
 #ifdef LOGGING
     Serial.println("Connected");
@@ -204,26 +204,26 @@ int HttpClient::sendInitialHeaders(const char* aServerName, IPAddress aServerIP,
     return HTTP_SUCCESS;
 }
 
-void HttpClient::sendHeader(const char* aHeader)
+void MMBHttpClient::sendHeader(const char* aHeader)
 {
     iClient->println(aHeader);
 }
 
-void HttpClient::sendHeader(const char* aHeaderName, const char* aHeaderValue)
+void MMBHttpClient::sendHeader(const char* aHeaderName, const char* aHeaderValue)
 {
     iClient->print(aHeaderName);
     iClient->print(": ");
     iClient->println(aHeaderValue);
 }
 
-void HttpClient::sendHeader(const char* aHeaderName, const int aHeaderValue)
+void MMBHttpClient::sendHeader(const char* aHeaderName, const int aHeaderValue)
 {
     iClient->print(aHeaderName);
     iClient->print(": ");
     iClient->println(aHeaderValue);
 }
 
-void HttpClient::sendBasicAuth(const char* aUser, const char* aPassword)
+void MMBHttpClient::sendBasicAuth(const char* aUser, const char* aPassword)
 {
     // Send the initial part of this header line
     iClient->print("Authorization: Basic ");
@@ -272,13 +272,13 @@ void HttpClient::sendBasicAuth(const char* aUser, const char* aPassword)
     iClient->println();
 }
 
-void HttpClient::finishHeaders()
+void MMBHttpClient::finishHeaders()
 {
     iClient->println();
     iState = eRequestSent;
 }
 
-void HttpClient::endRequest()
+void MMBHttpClient::endRequest()
 {
     if (iState < eRequestSent)
     {
@@ -288,7 +288,7 @@ void HttpClient::endRequest()
     // else the end of headers has already been sent, so nothing to do here
 }
 
-int HttpClient::responseStatusCode()
+int MMBHttpClient::responseStatusCode()
 {
     if (iState < eRequestSent)
     {
@@ -398,7 +398,7 @@ int HttpClient::responseStatusCode()
     }
 }
 
-int HttpClient::skipResponseHeaders()
+int MMBHttpClient::skipResponseHeaders()
 {
     // Just keep reading until we finish reading the headers or time out
     unsigned long timeoutStart = millis();
@@ -431,7 +431,7 @@ int HttpClient::skipResponseHeaders()
     }
 }
 
-bool HttpClient::endOfBodyReached()
+bool MMBHttpClient::endOfBodyReached()
 {
     if (endOfHeadersReached() && (contentLength() != kNoContentLengthHeader))
     {
@@ -441,7 +441,7 @@ bool HttpClient::endOfBodyReached()
     return false;
 }
 
-int HttpClient::read()
+int MMBHttpClient::read()
 {
 #if 0 // Fails on WiFi because multi-byte read seems to be broken
     uint8_t b[1];
@@ -469,7 +469,7 @@ int HttpClient::read()
 #endif
 }
 
-int HttpClient::read(uint8_t *buf, size_t size)
+int MMBHttpClient::read(uint8_t *buf, size_t size)
 {
     int ret =iClient->read(buf, size);
     if (endOfHeadersReached() && iContentLength > 0)
@@ -484,7 +484,7 @@ int HttpClient::read(uint8_t *buf, size_t size)
     return ret;
 }
 
-int HttpClient::readHeader()
+int MMBHttpClient::readHeader()
 {
     char c = read();
 
