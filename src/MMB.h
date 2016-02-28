@@ -62,6 +62,16 @@ class MMB {
 		void buildApiURL(char *url); //build API URL
 		void buildUrlencodedParameter(char *queryString, char *offset, char *value); //costruisce il parametro queryString
 
+		//---URLENCODE FUNCTION
+		char *_specialCharacters = "$&+,/:;=?@ <>#%{}|~[]`";
+
+		static char hex_digit(char c) {
+			return "01234567890ABCDEF"[c & 0x0F];
+		}
+
+		void urlencode(char *dst,char *src); //esegue l'urlencode della stringa
+		int countCharacterToUrlencode(char *str); 
+
 		//---EXECUTE
 		int execute(char *url); //segue la chiamata
 
@@ -77,16 +87,14 @@ class MMB {
 		//buffer QueryString
 		char *_queryString;
 		int _queryStringSize;
-		int _queryStringPos;
 
-		//bufferUriTemplate
+		//buffer UriTemplate
 		char *_uriTemplate;
 		int _uriTemplateSize;
-		int _uriTemplatePos;
 
+		//buffer x-www-form-urlencoded parameter
 		char *_xWWWFormUrlencoded;
 		int _xWWWFormUrlencodedSize;
-		int _xWWWFormUrlencodedPos;
 
 
 		#ifdef DEBUG

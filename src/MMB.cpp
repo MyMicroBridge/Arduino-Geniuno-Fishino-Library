@@ -22,19 +22,16 @@ MMB::MMB(Client& client, int accountNameBufferSize, int apiNameBufferSize, int q
 	//queryString
 	_queryString = (char *) malloc(queryStringBufferSize * sizeof(char)); //alloco la memoria
 	_queryStringSize = queryStringBufferSize; //salvo la dimensione
-	_queryStringPos = 0; //posizione della stringa
 	_queryString[0] = 0; //inserisco il carattere vuoto all'inizio
 
 	//uriTemplate
 	_uriTemplate = (char *) malloc(uriTemplateBufferSize * sizeof(char)); //alloco la memoria
 	_uriTemplateSize = uriTemplateBufferSize; //salvo la dimensione
-	_uriTemplatePos = 0; //posizione della stringa
 	_uriTemplate[0] = 0; //inserisco il carattere vuoto all'inizio
 
 	//uriTemplate
 	_xWWWFormUrlencoded = (char *) malloc(xWWWFormUrlencodedBufferSize * sizeof(char)); //alloco la memoria
 	_xWWWFormUrlencodedSize = xWWWFormUrlencodedBufferSize; //salvo la dimensione
-	_xWWWFormUrlencodedPos = 0; //posizione della stringa
 	_xWWWFormUrlencoded[0] = 0; //inserisco il carattere vuoto all'inizio
 	
 }
@@ -97,55 +94,36 @@ void MMB::setAPIName(char *api) { //api name
 //---AGGIUNTA PARAMETRI API
 void MMB::addQueryStringParameter(char *offset, char *value) { //query string
 
-	#ifdef DEBUG
-		debugPrint(F("\n SIZE OF _queryString: "));
-		debugPrint(String(_queryStringSize));
-		debugPrint(F("\n POSITION _queryString: "));
-		debugPrint(String(_queryStringPos));
-
-		debugPrint(F("\n SIZE OF data to insert: "));
-		debugPrint(String(strlen(offset) + strlen(value) +1));
-		debugPrint(F("\n"));
-	#endif
-
-
-	//se non è il primo parametro che inserisco
 	if (_queryString[0] == 0) { //se query string è vuota
 
-		if ((_queryStringSize - _queryStringPos) < (strlen(offset) + strlen(value) +2)) {
+		//size della stringa per contenere i dati
+		int size = strlen(offset) + strlen(value) + countCharacterToUrlencode(value)*2 + 2; //compresi = e terminatore di stringa
 
-			//salvo il contenuto del buffer
-			char tempBuffer[_queryStringSize];
-			strcpy(tempBuffer, _queryString);
-
+		if (_queryStringSize < size) {
 			//realloco il buffer e salvo la nuova dimensione
-			_queryString = (char *) realloc(_queryString, (_queryStringSize + strlen(offset) + strlen(value) +2) * sizeof(char));
-			_queryStringSize = _queryStringSize + strlen(offset) + strlen(value) +2;
-
-			//ricopio il contenuto del buffer
-			strcpy(_queryString, tempBuffer);
-
+			_queryString = (char *) realloc(_queryString, size * sizeof(char));
+			_queryStringSize = size;
 		}
 
-		_queryStringPos = _queryStringPos + strlen(offset) + strlen(value) +1; //pre-salvo la nuova posizione
 	} else {
 
-		if ((_queryStringSize - _queryStringPos) < (strlen(offset) + strlen(value) +3)) {
+		int size = strlen(offset) + strlen(value) + countCharacterToUrlencode(value)*2 + 3; //compresi = e & e terminatore di stringa
+
+		if ((_queryStringSize - strlen(_queryString) +1) < size) {
+
 			//salvo il contenuto del buffer
-			char tempBuffer[_queryStringSize];
+			char tempBuffer[strlen(_queryString) +1];
 			strcpy(tempBuffer, _queryString);
 
 			//realloco il buffer e salvo la nuova dimensione
-			_queryString = (char *) realloc(_queryString, (_queryStringSize + strlen(offset) + strlen(value) +3) * sizeof(char));
-			_queryStringSize = _queryStringSize + strlen(offset) + strlen(value) +3;
+			_queryString = (char *) realloc(_queryString, (strlen(_queryString) + size) * sizeof(char));
+			_queryStringSize = strlen(_queryString) + size;
 
 			//ricopio il contenuto del buffer
 			strcpy(_queryString, tempBuffer);
 		}
 
 		strcat(_queryString, "&\0"); //aggiungo il carattere di separazione
-
-		_queryStringPos = _queryStringPos + strlen(offset) + strlen(value) +2; //pre-salvo la nuova posizione
 	}
 
 	buildUrlencodedParameter(_queryString, offset, value); //aggiungo il parametro
@@ -154,113 +132,78 @@ void MMB::addQueryStringParameter(char *offset, char *value) { //query string
 
 void MMB::addUriTemplateParameter(char *value) { //uri template //DEVONO ESSERE INSERITI IN ORDINE
 
-	#ifdef DEBUG
-		debugPrint(F("\n SIZE OF _uriTemplate: "));
-		debugPrint(String(_uriTemplateSize));
-		debugPrint(F("\n POSITION _uriTemplate: "));
-		debugPrint(String(_uriTemplatePos));
-
-		debugPrint(F("\n SIZE OF data to insert: "));
-		debugPrint(String(strlen(value) +1));
-		debugPrint(F("\n"));
-	#endif
-
 	if (_uriTemplate[0] == 0) { //se query string è vuota
 
-		if ((_uriTemplateSize - _uriTemplatePos) < (strlen(value) +1)) {
+		//size della stringa per contenere i dati
+		int size = strlen(value) + countCharacterToUrlencode(value)*2 + 1; //compreso terminatore di stringa
 
-			//salvo il contenuto del buffer
-			char tempBuffer[_uriTemplateSize];
-			strcpy(tempBuffer, _uriTemplate);
-
+		if (_uriTemplateSize < size) {
 			//realloco il buffer e salvo la nuova dimensione
-			_uriTemplate = (char *) realloc(_uriTemplate, (_uriTemplateSize + strlen(value) +1) * sizeof(char));
-			_uriTemplateSize = _uriTemplateSize + strlen(value) +1;
-
-			//ricopio il contenuto del buffer
-			strcpy(_uriTemplate, tempBuffer);
-
+			_uriTemplate = (char *) realloc(_uriTemplate, size * sizeof(char));
+			_uriTemplateSize = size;
 		}
-
-		_uriTemplatePos = _uriTemplatePos + strlen(value); //pre-salvo la nuova posizione
 
 	} else {
 
-		if ((_uriTemplateSize - _uriTemplatePos) < (strlen(value) +2)) {
+		int size = strlen(value) + countCharacterToUrlencode(value)*2 + 2; //compresi = e & e terminatore di stringa
+
+		if ((_uriTemplateSize - strlen(_uriTemplate) +1) < size) {
 
 			//salvo il contenuto del buffer
-			char tempBuffer[_uriTemplateSize];
+			char tempBuffer[strlen(_uriTemplate) +1];
 			strcpy(tempBuffer, _uriTemplate);
 
 			//realloco il buffer e salvo la nuova dimensione
-			_uriTemplate = (char *) realloc(_uriTemplate, (_uriTemplateSize + strlen(value) +2) * sizeof(char));
-			_uriTemplateSize = _uriTemplateSize + strlen(value) +2;
+			_uriTemplate = (char *) realloc(_uriTemplate, (strlen(_uriTemplate) + size) * sizeof(char));
+			_uriTemplateSize = strlen(_uriTemplate) + size;
 
 			//ricopio il contenuto del buffer
 			strcpy(_uriTemplate, tempBuffer);
-
 		}
 
 		strcat(_uriTemplate, "/\0"); //aggiungo il carattere di separazione
-
-		_uriTemplatePos = _uriTemplatePos + strlen(value) +1; //pre-salvo la nuova posizione
 	}
 
-	strcat(_uriTemplate, value); //aggiungo il carattere di separazione
+	//posizione da cui inserire value urlencoded
+	int position = strlen(_uriTemplate);
+
+	//inserisco la stringa dopo la conversione
+	urlencode(&_uriTemplate[position], value);
 	
 }
 
 void MMB::addXWWWFormUrlencodedParameter(char *offset, char *value) { //x-www-form-urlencoded
 
-	#ifdef DEBUG
-		debugPrint(F("\n SIZE OF _xWWWFormUrlencoded: "));
-		debugPrint(String(_xWWWFormUrlencodedSize));
-		debugPrint(F("\n POSITION _xWWWFormUrlencoded: "));
-		debugPrint(String(_xWWWFormUrlencodedPos));
-
-		debugPrint(F("\n SIZE OF data to insert: "));
-		debugPrint(String(strlen(offset) + strlen(value) +1));
-		debugPrint(F("\n"));
-	#endif
-
-
-	//se non è il primo parametro che inserisco
 	if (_xWWWFormUrlencoded[0] == 0) { //se query string è vuota
 
-		if ((_xWWWFormUrlencodedSize - _xWWWFormUrlencodedPos) < (strlen(offset) + strlen(value) +2)) {
+		//size della stringa per contenere i dati
+		int size = strlen(offset) + strlen(value) + countCharacterToUrlencode(value)*2 + 2; //compresi = e terminatore di stringa
 
-			//salvo il contenuto del buffer
-			char tempBuffer[_xWWWFormUrlencodedSize];
-			strcpy(tempBuffer, _xWWWFormUrlencoded);
-
+		if (_xWWWFormUrlencodedSize < size) {
 			//realloco il buffer e salvo la nuova dimensione
-			_xWWWFormUrlencoded = (char *) realloc(_xWWWFormUrlencoded, (_xWWWFormUrlencodedSize + strlen(offset) + strlen(value) +2) * sizeof(char));
-			_xWWWFormUrlencodedSize = _xWWWFormUrlencodedSize + strlen(offset) + strlen(value) +2;
-
-			//ricopio il contenuto del buffer
-			strcpy(_xWWWFormUrlencoded, tempBuffer);
-
+			_xWWWFormUrlencoded = (char *) realloc(_xWWWFormUrlencoded, size * sizeof(char));
+			_xWWWFormUrlencodedSize = size;
 		}
 
-		_xWWWFormUrlencodedPos = _xWWWFormUrlencodedPos + strlen(offset) + strlen(value) +1; //pre-salvo la nuova posizione
 	} else {
 
-		if ((_xWWWFormUrlencodedSize - _xWWWFormUrlencodedPos) < (strlen(offset) + strlen(value) +3)) {
+		int size = strlen(offset) + strlen(value) + countCharacterToUrlencode(value)*2 + 3; //compresi = e & e terminatore di stringa
+
+		if ((_xWWWFormUrlencodedSize - strlen(_xWWWFormUrlencoded) +1) < size) {
+
 			//salvo il contenuto del buffer
-			char tempBuffer[_xWWWFormUrlencodedSize];
+			char tempBuffer[strlen(_xWWWFormUrlencoded) +1];
 			strcpy(tempBuffer, _xWWWFormUrlencoded);
 
 			//realloco il buffer e salvo la nuova dimensione
-			_xWWWFormUrlencoded = (char *) realloc(_xWWWFormUrlencoded, (_xWWWFormUrlencodedSize + strlen(offset) + strlen(value) +3) * sizeof(char));
-			_xWWWFormUrlencodedSize = _xWWWFormUrlencodedSize + strlen(offset) + strlen(value) +3;
+			_xWWWFormUrlencoded = (char *) realloc(_xWWWFormUrlencoded, (strlen(_xWWWFormUrlencoded) + size) * sizeof(char));
+			_xWWWFormUrlencodedSize = strlen(_xWWWFormUrlencoded) + size;
 
 			//ricopio il contenuto del buffer
 			strcpy(_xWWWFormUrlencoded, tempBuffer);
 		}
 
 		strcat(_xWWWFormUrlencoded, "&\0"); //aggiungo il carattere di separazione
-
-		_xWWWFormUrlencodedPos = _xWWWFormUrlencodedPos + strlen(offset) + strlen(value) +2; //pre-salvo la nuova posizione
 	}
 
 	buildUrlencodedParameter(_xWWWFormUrlencoded, offset, value); //aggiungo il parametro
@@ -285,40 +228,39 @@ int MMB::run() {
 		debugPrint(F("Running..............."));
 	#endif
 
-	//creo e inizializzo url con size minima
-	if ((_uriTemplate[0] != 0) && (_queryString[0] != 0)) {
-		char url[_accountNameSize + 1 + _apiNameSize +1 + _uriTemplatePos +1 + _queryStringPos + 2 +1];
+	//size della stringa contenente l'url
+	int size = 1; //spazio per il carattere terminatore
 
-		url[0] = 0;
+	//dimensione accountName
+	size += strlen(_accountName) +1; //compreso / iniziale
 
-		buildApiURL(url);
-		return execute(url);
-	
-	} else if (_uriTemplate[0] != 0) {
-		char url[_accountNameSize + 1 + _apiNameSize +1 + _uriTemplatePos +1 +1];
+	//dimensione apiName
+	size += strlen(_apiName) +1; //compreso / iniziale
 
-		url[0] = 0;
+	//dimensione uriTemplate
+	if (_uriTemplate[0] != 0) { //se sono presenti parametri uriTemplate
+		size += strlen(_uriTemplate) +1; //compreso / iniziale
 
-		buildApiURL(url);
-		return execute(url);
-
-	}  else if (_queryString[0] != 0) {
-		char url[_accountNameSize + 1 + _apiNameSize +1 + _queryStringPos + 2 +1];
-
-		url[0] = 0;
-
-		buildApiURL(url);
-		return execute(url);
-	
-	} else {
-		char url[_accountNameSize + 1 + _apiNameSize +1 +1];
-
-		url[0] = 0;
-
-		buildApiURL(url);
-		return execute(url);
 	}
 
+	//dimensione queryString
+	if (_queryString[0] != 0) { //se sono presenti parametri queryString
+		size += strlen(_queryString) +2; //compresi /? iniziali
+	}
+
+	#ifdef DEBUG
+		debugPrint(F("\nSIZE of URL: "));
+		debugPrint(String(size));
+		debugPrint(F("\n"));
+	#endif
+
+	//inzializzo la variabile contenente l'url
+	char url[size];
+
+	url[0] = 0; //inserisco il terminatore di stringa
+
+	buildApiURL(url); //costruisco l'url
+	return execute(url); //eseguo la chiamata http
 }
 
 
@@ -353,6 +295,17 @@ int MMB::execute(char *url) {
 
 		//---END REQUEST
 		_http.endRequest();
+
+		//---PRINT STATUS CODE
+		#ifdef DEBUG
+			debugPrint(F("BODY: "));
+			debugPrint(_xWWWFormUrlencoded);
+			debugPrint(F("\n"));
+			debugPrint(F("BODY SIZE: "));
+			debugPrint(String(strlen(_xWWWFormUrlencoded)));
+			debugPrint(F("\n"));
+			debugPrint(F("\n"));
+		#endif
 
 		//---SEND BODY
 		_http.println(_xWWWFormUrlencoded);
@@ -394,7 +347,7 @@ int MMB::execute(char *url) {
 }
 
 //costruisce l'url della risorsa (API) con i parametri
-void MMB::buildApiURL(char * url) {
+void MMB::buildApiURL(char *url) {
 
 	//---BASE URL
 	strcat(url, "/");
@@ -417,12 +370,45 @@ void MMB::buildApiURL(char * url) {
 }
 
 //costruisce e restituisce un parametro query string
-void MMB::buildUrlencodedParameter(char *queryString, char *offset, char *value) {
+void MMB::buildUrlencodedParameter(char *str, char *offset, char *value) {
 
+	//eseguo l'ulrencode dei parametri e li inserisco
 	//inserisco il parametro 
-	strcat(queryString, offset);
-	strcat(queryString, "=\0");
-	strcat(queryString, value);
+	strcat(str, offset);
+	strcat(str, "=\0");
+
+	//posizione da cui inserire value urlencoded
+	int position = strlen(str);
+
+	//inserisco la stringa dopo la conversione
+	urlencode(&str[position], value);
+}
+
+//---URLENCODE
+void MMB::urlencode(char *dst,char *src) { //esegue l'urlencode della stringa
+	char c,*d = dst;
+	while (c = *src++) {  
+		if (strchr(_specialCharacters, c)) {  
+			*d++ = '%';
+			*d++ = hex_digit(c >> 4);
+			c = hex_digit(c);
+		}
+		*d++ = c;
+	}
+	*d = '\0';
+}
+
+int MMB::countCharacterToUrlencode(char *str) { //conta il numero di caratteri da convertire
+	char c;
+	int n = 0;
+
+	while (c = *str++) {  
+		if (strchr(_specialCharacters, c)) {  
+        	n++;
+		}
+	}
+
+	return n;
 }
 
 
