@@ -62,7 +62,7 @@ void setup()
   mmb.setAPIName(MMB_API_NAME);
 
   //set API parameter
-  mmb.addQueryStringParameter("city", "Ceggia"); //must be urlencoded if there are special characters (e.g. "San Donà di Piave" must be "San%20Donà%20di%20Piave")
+  mmb.addQueryStringParameter("city", "Ceggia");
   
   //run
   mmb.run();
