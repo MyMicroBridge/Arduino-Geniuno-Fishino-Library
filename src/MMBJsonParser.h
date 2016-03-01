@@ -14,8 +14,8 @@
 #include <ArduinoJson.h>
 
 //PARSING CODE
-#define MMBJSON_PARSE_SUCCESS 0
-#define MMBJSON_PARSE_ERROR -1
+#define MMBJSON_PARSE_SUCCESS 1
+#define MMBJSON_PARSE_ERROR 0
 
 //---STATUS CODE
 //bad request 1xx

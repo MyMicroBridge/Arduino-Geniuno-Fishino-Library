@@ -21,7 +21,7 @@ MMBJsonParser::MMBJsonParser(int dim) {
 	_openQuotes = 0;
 
 	//inizializzo il siccesso del parsing a 0
-	_parseSuccess = MMBJSON_PARSE_SUCCESS; //ci sono errori
+	_parseSuccess = MMBJSON_PARSE_ERROR; //ci sono errori
 }
 
 //destroyer
