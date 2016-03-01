@@ -46,7 +46,7 @@ void MMBJsonParser::parseJson(char *message) { //devono essere già stati elimin
 }
 
 void MMBJsonParser::parseJson(String message) { //elimino \n \t e spazi
-	
+
 	//inserisco tutti i caratteri nel buffer interno
 	for (int i = 0; i < message.length(); i++) {
 		addCharacter(message.charAt(i));
@@ -70,14 +70,17 @@ void MMBJsonParser::parseJson() { //elimino \n \t e spazi
 	_json = &_jsonBuffer.parseObject(_jsonMessage);
 
 
-	if (!(*_json).success()) {
+	if (_json->success()) {
 		#ifdef DEBUG
-			debugPrint(F("_json parseObject() failed\n"));
+			debugPrint(F("\nPARSE SUCCESS\n"));
 		#endif
-		
 		_parseSuccess = MMBJSON_PARSE_SUCCESS;
 
 	} else {
+		#ifdef DEBUG
+			debugPrint(F("\nPARSE ERROR\n"));
+		#endif
+		
 		_parseSuccess = MMBJSON_PARSE_ERROR;
 	}
 }
