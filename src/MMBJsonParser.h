@@ -13,7 +13,7 @@
 #include "Arduino.h"
 #include <ArduinoJson.h>
 
-//HTTP CODE
+//PARSING CODE
 #define MMBJSON_PARSE_SUCCESS 0
 #define MMBJSON_PARSE_ERROR -1
 
