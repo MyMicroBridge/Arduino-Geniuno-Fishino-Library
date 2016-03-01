@@ -39,7 +39,7 @@ void MMBJsonParser::parseJson(char *message) { //devono essere già stati elimin
 	}
 
 	//inserisco il terminatore
-	addCharacter("\0");
+	addCharacter('\0');
 
 	//eseguo il parsing
 	parseJson();
@@ -53,7 +53,7 @@ void MMBJsonParser::parseJson(String message) { //elimino \n \t e spazi
 	}
 
 	//inserisco il terminatore
-	addCharacter("\0");
+	addCharacter('\0');
 
 	//eseguo il parsing
 	parseJson();
