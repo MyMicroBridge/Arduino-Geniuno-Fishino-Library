@@ -21,7 +21,7 @@ MMBJsonParser::MMBJsonParser(int dim) {
 	_openQuotes = 0;
 
 	//inizializzo il siccesso del parsing a 0
-	_parseSuccess = 0; //ci sono errori
+	_parseSuccess = MMBJSON_PARSE_SUCCESS; //ci sono errori
 }
 
 //destroyer
@@ -32,62 +32,31 @@ MMBJsonParser::~MMBJsonParser() {
 
 //---PARSE FUNCTION
 void MMBJsonParser::parseJson(char *message) { //devono essere già stati eliminati \n \t e spazi
-	
-	#ifdef DEBUG
-		debugPrint(F("\n\n---MESSAGE TO PARSE---\n\n"));
-		debugPrint(message);
-	#endif
 
-	strcpy(_jsonMessage, message);
-
-	//creo json object
-	_json = &_jsonBuffer.parseObject(_jsonMessage);
-
-
-	if (!(*_json).success()) {
-		#ifdef DEBUG
-			debugPrint(F("_json parseObject() failed\n"));
-		#endif
-
-		_parseSuccess = 0;
-
-	} else {
-		_parseSuccess = 1;
+	//inserisco tutti i caratteri nel buffer interno
+	for (int i = 0; i < strlen(message); i++) {
+		addCharacter(message[i]);
 	}
+
+	//inserisco il terminatore
+	addCharacter("\0");
+
+	//eseguo il parsing
+	parseJson();
 }
 
 void MMBJsonParser::parseJson(String message) { //elimino \n \t e spazi
 	
-	message.replace("\n", "");
-	message.replace("\t", "");
-	message.replace(" ", "");
-
-	#ifdef DEBUG
-		debugPrint(F("\n\n---MESSAGE TO PARSE---\n\n"));
-		debugPrint(message);
-	#endif
-
-
-
-	message.toCharArray(_jsonMessage, JSON_MESSAGE_INITIAL_SIZE);
-
-	//strcpy(_jsonMessage, message);
-	//strcat(_jsonMessage, "\0");
-
-	//creo json object
-	_json = &_jsonBuffer.parseObject(_jsonMessage);
-
-
-	if (!(*_json).success()) {
-		#ifdef DEBUG
-			debugPrint(F("_json parseObject() failed\n"));
-		#endif
-		
-		_parseSuccess = 0;
-
-	} else {
-		_parseSuccess = 1;
+	//inserisco tutti i caratteri nel buffer interno
+	for (int i = 0; i < message.length(); i++) {
+		addCharacter(message.charAt(i));
 	}
+
+	//inserisco il terminatore
+	addCharacter("\0");
+
+	//eseguo il parsing
+	parseJson();
 }
 
 void MMBJsonParser::parseJson() { //elimino \n \t e spazi
@@ -106,10 +75,10 @@ void MMBJsonParser::parseJson() { //elimino \n \t e spazi
 			debugPrint(F("_json parseObject() failed\n"));
 		#endif
 		
-		_parseSuccess = 0;
+		_parseSuccess = MMBJSON_PARSE_SUCCESS;
 
 	} else {
-		_parseSuccess = 1;
+		_parseSuccess = MMBJSON_PARSE_ERROR;
 	}
 }
 

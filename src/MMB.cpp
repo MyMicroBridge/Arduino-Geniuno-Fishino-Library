@@ -330,6 +330,8 @@ int MMB::execute(char *url) {
 		//skip ResponseHeader
 		_http.skipResponseHeaders();
 
+		return MMB_HTTP_SUCCESS;
+
 	} else {
 
 		//---PRINT ERROR
@@ -341,7 +343,7 @@ int MMB::execute(char *url) {
 			debugPrint(F("\n"));
 		#endif
 
-		return status; //ritorno il codice di errore
+		return MMB_HTTP_ERROR; //ritorno il codice di errore
 	}
 
 }

@@ -1,9 +1,6 @@
 /*
 	MMB Library
 
-	MANCA GESTIONE PARAMETRI x-www-form-urlencoded
-	MANCA GESTIONE urlencode dei parametri querystring e x-www-form-urlencoded
-
 	MANCA GESTIONE ERRORI CHIAMATA
 */
 
@@ -14,7 +11,11 @@
 #include "Client.h"
 #include "MMBHttpClient.h"
 
+//HTTP CODE
+#define MMB_HTTP_SUCCESS 0
+#define MMB_HTTP_ERROR -1
 
+//---INTERNAL CONFIGURATION
 //debug
 //#define DEBUG 1
 
